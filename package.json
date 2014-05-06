@@ -1,0 +1,23 @@
+{
+  "name": "NodaKwaeri",
+  "version": "0.0.1",
+  "description": "Kwaeri for Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rikkotec/nodakwaeri.git"
+  },
+  "keywords": [
+    "NodaKwaeri",
+    "Kwaeri"
+  ],
+  "author": "Richard Winters <rik@massivelymodified.com> (http://www.massivelymodified.com)",
+  "license": "LGPL V3.0",
+  "bugs": {
+    "url": "https://github.com/rikkotec/nodakwaeri/issues"
+  },
+  "homepage": "https://github.com/rikkotec/nodakwaeri"
+}
