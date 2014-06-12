@@ -1,10 +1,10 @@
 /**
  * package: nodakwaeri
  * subpackage: html.construct
- * version:  0.0.0
+ * version:  0.0.1
  * author:  Richard B. Winters <a href="mailto:rik@mmogp.com">rik At MassivelyModified</a>
  * copyright: 2013-2014 Richard B. Winters
- * license: GNU LGPL V3.0
+ * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
 
 // Deps
@@ -19,7 +19,9 @@
  *
  * @since 0.0.1
  */
-module.exports = function( t, a )
+module.exports = exports = construct;
+
+= function( t, a )
 {
 	// Prep
 	var classmap =
@@ -56,7 +58,7 @@ module.exports = function( t, a )
 	},
 	o = "";
 	
-	a = module.exports.extend( a, def );
+	a = nodakwaeri.extend( a, def );
 	
 	switch( t )
 	{
