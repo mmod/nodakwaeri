@@ -9,11 +9,9 @@
 
 exports.get = function( request, response )
 {
-	response.writeHead
-	( 
-			404, 
-			{ 'Content-Type': 'text/html' } 
-	);
+	response.setStatus = 404;
+	response.setHeader( 'Content-Type', 'text/html' );
+	//response.writeHead();
 	
 	response.write
 	(

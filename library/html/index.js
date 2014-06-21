@@ -28,9 +28,28 @@ html.prototype.version = function()
 html.prototype.label = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'label', args );
@@ -39,9 +58,28 @@ html.prototype.label = function( a1, a2 )
 html.prototype.textbox = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'text', args );
@@ -50,9 +88,28 @@ html.prototype.textbox = function( a1, a2 )
 html.prototype.password = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'password', args );
@@ -61,9 +118,28 @@ html.prototype.password = function( a1, a2 )
 html.prototype.textarea = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'textarea', args );
@@ -72,9 +148,28 @@ html.prototype.textarea = function( a1, a2 )
 html.prototype.select = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'select', args );
@@ -83,9 +178,28 @@ html.prototype.select = function( a1, a2 )
 html.prototype.checkbox = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'checkbox', args );
@@ -94,9 +208,28 @@ html.prototype.checkbox = function( a1, a2 )
 html.prototype.radio = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'radio', args );
@@ -105,9 +238,28 @@ html.prototype.radio = function( a1, a2 )
 html.prototype.button = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'button', args );
@@ -116,9 +268,28 @@ html.prototype.button = function( a1, a2 )
 html.prototype.submit = function( a1, a2 )
 {
 	var args = {};
-	if( a2 !== undefined )
+	
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
 	{
 		args['id'] = a1;
+		args['model'] = false;
+	}
+	if( a2 !== undefined )
+	{
 		html.prototype.nk.extend( args, a2 );
 	}
 	return html.prototype.construct( 'submit', args );
@@ -128,12 +299,29 @@ html.prototype.validationmessage = function( a1, a2 )
 {
 	var args = {};
 	
-	args['id'] = a1;
+	// Check if we're using model values
+	if( html.prototype.nk.type( a1 ) === 'array' )
+	{
+		if( a1[0] === false )
+		{
+			args['id'] = a1[1];
+			args['model'] = false;
+		}
+		else
+		{
+			args['id'] = a1[0];
+			args['model'] = a1[1];
+		}
+	}
+	else
+	{
+		args['id'] = a1;
+		args['model'] = false;
+	}
 	if( a2 !== undefined )
 	{
 		html.prototype.nk.extend( args, a2 );
 	}
-	
 	return html.prototype.construct( 'validationmessage', args );
 };
 
@@ -149,15 +337,15 @@ html.prototype.construct = function( t, a )
 		select: "form-control",
 		"nk-select": "form-control",
 		radio: "form-control",
-		checkbox: "form-control",
+		checkbox: "",
 		slider: "form-control",
 		button: "btn ",
 		submit: "btn ",
 	},
 	def = 
 	{
-		id: "",
-		name: "",
+		id: a.id || "",
+		name: a.name || a.id || "",
 		rows: 10,
 		cols: 50,
 		value: "",
@@ -180,14 +368,37 @@ html.prototype.construct = function( t, a )
 	{
 		case 'label':
 		{
+			if( a.model !== false )
+			{
+				//for( var part in a.model.schema )
+				//{
+					//console.log( 'Schema [' + part + ']' );
+				//}
+				//console.log( 'Schema Identifier: ' + a.id );
+				a.value = a.model.schema[a.id][2];
+			}
+			else
+			{
+				console.log( 'No Schema [' + a.id + ']' );
+				a.value = a.id;
+			}
+			
 			//console.log( 'Label' );
-			o = '<label class="' + a["classes"] + '" for="' + a["id"] + '">' + a["value"] + '</label>\n';
+			o = '<label class="' + a["classes"] + '" for="' + a["id"] + '">' + a.value + '</label>\n';
 		}break;
 		
 		case 'text':
 		case 'password':
 		case 'submit':
 		{
+			if( a.model !== false )
+			{
+				a.value = a.model.schema[a.id][2];
+			}
+			else
+			{
+				a.value = a.id;
+			}
 			//console.log( 'Text or Password or Submit Input Type' );
 			if( !a["val"] )
 			{
@@ -205,6 +416,14 @@ html.prototype.construct = function( t, a )
 		
 		case 'textarea':
 		{
+			if( a.model !== false )
+			{
+				a.value = a.model.schema[a.id][2];
+			}
+			else
+			{
+				a.value = a.id;
+			}
 			if( !a["val"] )
 			{
 				o = '<textarea class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" rows="' + a["rows"] +'" cols="' + a["cols"] +'" tabindex="' + a["index"] + '" placeholder="' + a["value"] + '">\n';
@@ -217,6 +436,14 @@ html.prototype.construct = function( t, a )
 		
 		case 'select':
 		{
+			if( a.model !== false )
+			{
+				a.value = a.model.schema[a.id][2];
+			}
+			else
+			{
+				a.value = a.id;
+			}
 			if( !a["val"] )
 			{
 				o = '<select class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '">\n';
@@ -265,12 +492,45 @@ html.prototype.construct = function( t, a )
 		
 		case 'button':
 		{
+			if( a.model !== false )
+			{
+				a.value = a.model.schema[a.id][2];
+			}
+			else
+			{
+				a.value = a.id;
+			}
 			o = '<button id="' + a["id"] + '" class="' + a["classes"] + '" tabindex="' + a["index"] + '" aria-haspopup="false">"' + a["value"] + '</button>\n';
 		}break;
 		
 		case 'checkbox':
 		case 'radio':
 		{
+			if( a.model !== false )
+			{
+				if( t === 'radio' )
+				{
+					// A radio is usually in a group of other radios, the values could be numeric or textual, and expand beyond a simple true false for the group.
+					a.value = a.model.schema[a.id][2];
+				}
+				else
+				{
+					// Checkbox only needs to be 0 or 1, because the name is essentially the only textual value we need
+					a.value = 1;
+				}
+			}
+			else
+			{
+				if( t === 'radio' )
+				{
+					a.value = a.id;
+				}
+				else
+				{
+					a.value = 1;
+				}
+			}
+			
 			//console.log( 'Checkbox' );
 			var checked = "";
 			if( a["checked"] !== false )
@@ -280,11 +540,11 @@ html.prototype.construct = function( t, a )
 			
 			if( !a["val"] )
 			{
-				o = '<input type="' + t + '" class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" value="' + a["value"] + '" ' + checked + '>\n';
+				o = '<input type="' + t + '" class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" value="' + a.value + '" ' + checked + '>\n';
 			}
 			else
 			{
-				o = '<input type="' + t + '" class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" value="' + a["value"] + '" data-val="' + a["val"] + '" data-val-required="' + a["valmsg"] + '" ' + checked + '>\n';
+				o = '<input type="' + t + '" class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" value="' + a.value + '" data-val="' + a["val"] + '" data-val-required="' + a["valmsg"] + '" ' + checked + '>\n';
 			}
 		}break;
 		

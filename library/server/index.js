@@ -10,6 +10,8 @@
 
 // Deps
 var http = require( 'http' );
+var qs = require( 'querystring' );
+var url = require( 'url' );
 
 
 module.exports = exports = server;
@@ -17,7 +19,6 @@ module.exports = exports = server;
 //Entry point of the server
 function server( config )
 {
-	//console.log( config );
 	this.config = config;
 };
 
@@ -32,32 +33,83 @@ function server( config )
  */
 server.prototype.start = function()
 {
-	// Get our routing provider, then remove its reference from the configuration itself so we arent passing it forward
+	var served = this;
+
+	// Get our session and routing provider(s)
+	//var session_provider = this.config.session_provider;
 	var routing_provider = this.config.routing_provider;
 	
+	//delete this.config['session_provider'];
 	delete this.config['routing_provider'];
 	
-	// Now create a new instance of our routing provider, feeding it the configuration ahead of time so we don't need
+	// Now create a new instance of our session and/or routing provider(s), feeding them their configuration ahead of time so we don't need
 	// to pass it forward each time - just this once (Now it doesn't really matter that I wanted to be so anal about
 	// verb-age :).
+	//var session = new session_provider( this.config );
 	var router = new routing_provider( this.config );
-	
-	//for( var property in this.config )
-	//{
-	//	console.log( property );
-	//}
+	this.config.router = router;
 	
 	// Define our http server application
 	var app = http.createServer
 	(
-			function( request, response )
+		function( request, response )
+		{
+			if( request.method === 'POST' )
+			{
+				served.processPost( request, response );
+			}
+			else
 			{
 				router.route( request, response );
 			}
+		}
 	);
 
 	// Start the http server
 	app.listen( this.config.server.port, this.config.server.host );
 	console.log( 'Platform: ' + process.platform + '\nArchitecture: ' + process.arch );
 	console.log( 'Listening to http://' + this.config.server.host + ' on port ' + this.config.server.port );
+};
+
+server.prototype.processPost = function( request, response )
+{
+	var served = this;
+	
+	// Extract any posted data
+	var posted = '';
+	request.on
+	( 
+		'data',
+		function( data )
+		{
+			posted += data.toString();
+			
+			// Make sure we aren't getting DOS bombed
+			if( posted.length > 1e6 )	// Assuming this works out to 5000000 or ~ 5MB
+			{
+				console.log( 'Connection destroyed my son, network flooded in postage.' );
+				request.connection.destroy();
+			}
+		}
+	);
+	request.on
+	( 
+		'end', 
+		function()
+		{
+			// Add a new member to our request object containing the data
+			request.posted = qs.parse( posted );
+			//console.log( request.posted );
+			
+			served.config.router.route( request, response );
+		}
+	);
+	request.on
+	(
+		'error',
+		function( e )
+		{
+			console.log( 'Error receiving http body [POST]: ' + e.message );
+		}
+	);
 };
