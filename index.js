@@ -185,8 +185,8 @@ nk.prototype.init = function( o )
 	// fullest, and invoke this method supplying only the necessary paths
 	var defaults = 
 	{
-		routing_provider: 'nk',
 		session_provider: 'nk',
+		routing_provider: 'nk',
 		controller_provider: 'nk',
 		model_provider: 'nk',
 		view_provider: 'nk'
@@ -201,6 +201,13 @@ nk.prototype.init = function( o )
 		console.error( 'MVC and Asset paths must be set.' );
 		
 		throw ( 'MVC and Asset paths must be set.' );
+	}
+	
+	// If a custom session provider wasn't specified, deploy the built in session provider
+	if( o.session_provider === 'nk' )
+	{
+		o.session_provider = this.session;
+		console.log( 'Using nk.session for sessions' );
 	}
 	
 	// If a custom router wasn't provided, deploy the built in router
@@ -267,6 +274,8 @@ nk.prototype.init = function( o )
 };
 
 nk.prototype.server = require( "./library/server" );
+
+nk.prototype.session = require( "./library/session" );
 
 nk.prototype.router = require( "./library/router" );
 

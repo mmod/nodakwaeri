@@ -17,15 +17,19 @@ module.exports = exports = router;
 
 function router( config )
 {
+	var session_provider = config.session_provider;
+	
 	this.controller = config.controller_provider;
 	this.asset_path = config.app.asset_path;
 	
 	// Remove references we do not want to pass forward with the configuration
+	delete config.session_provider;
 	delete config.controller_provider;
 	
-	// Set the controller's configuration
-	this.controller['config'] = config;
+	this.sessions = new session_provider( config );
 	
+	// Set the controller's configuration
+	this.controller.config = config;
 };
 
 // Begin the process
@@ -39,7 +43,7 @@ router.prototype.route = function( request, response )
 	// Get the path
 	var path = request.requrl.pathname;
 	
-	// Get the referer
+	// Get the referrer
 	var referer = request.headers.referer;
 	
 	// Check the type of content the request is for, and set the proper headers.
@@ -157,11 +161,9 @@ router.prototype.route = function( request, response )
 		}
 		
 		// Send a success header
-		response.writeHead
-		(
-				200,
-				{ 'Content-Type': mediaType }
-		);
+		response.statusCode = 200;
+		response.setHeader( 'Content-Type', mediaType );
+		//response.writeHead( 200, { 'Content-Type': mediaType } );
 		
 		//console.log( assets + path );
 		// Read in the asset or resource
@@ -199,9 +201,17 @@ router.prototype.route = function( request, response )
 	else
 	{
 		//console.log( 'Page requested, referer: ' + referer );
+		var controller = this.controller;
 		
 		// Attempt to load the requested controller
-		this.controller.approach( request, response );
-		//require( './controllers/404' ).get( request, response );
+		this.sessions.find
+		( 
+			request, 
+			response, 
+			function( req, res )
+			{
+				controller.approach( req, res );
+			}
+		);
 	}
 };

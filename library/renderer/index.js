@@ -60,18 +60,11 @@ renderer.prototype.construct = function( request, response, klay )
 						
 						// And set content to contain an error message
 						buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
-						
-						response.writeHead
-						(
-								200,
-								{ 'Content-Type': 'text/html' }
-						);
-						
-						response.write
-						(
-							buffer
-						);
-						
+
+						response.statusCode = 200;
+						response.setHeader( 'Content-Type', 'text/html' );
+						//response.writeHead( 200, { 'Content-Type': 'text/html' } );
+						response.write( buffer );
 						response.end();
 					}
 					else
@@ -92,18 +85,11 @@ renderer.prototype.construct = function( request, response, klay )
 										
 										// And set content to contain an error message
 										buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
-										
-										response.writeHead
-										(
-												200,
-												{ 'Content-Type': 'text/html' }
-										);
-										
-										response.write
-										(
-											buffer
-										);
-										
+
+										response.statusCode = 200;
+										response.setHeader( 'Content-Type', 'text/html' );
+										//response.writeHead();
+										response.write ( buffer );
 										response.end();
 									}
 									else
@@ -136,18 +122,11 @@ renderer.prototype.construct = function( request, response, klay )
 					
 					// And set content to contain an error message
 					buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad!!!!...</h1><p>There was an issue loading the requested view: " + error + "\n" + data +"</p></body></html>";
-					
-					response.writeHead
-					(
-							200,
-							{ 'Content-Type': 'text/html' }
-					);
-					
-					response.write
-					(
-						buffer
-					);
-					
+
+					response.statusCode = 200;
+					response.setHeader( 'Content-Type', 'text/html' );
+					//response.writeHead();
+					response.write( buffer );
 					response.end();
 				}
 				else
@@ -219,33 +198,21 @@ renderer.prototype.parse = function( request, response, klay )
 				return processor.decorate( codeflow, codeflow, klay );
 			}
 		);
-		
-		response.writeHead
-		(
-			200,
-			{ 'Content-Type': 'text/html' }
-		);
-		
-		response.write
-		(
-			view
-		);
-		
+
+		response.statusCode = 200;
+		response.setHeader( 'Content-Type', 'text/html' );
+		//response.writeHead();
+		response.write( view );
 		response.end();
 	}
-		
-	response.writeHead
-	(
-		200,
-		{ 'Content-Type': 'text/html' }
-	);
-	
-	response.write
-	(
-		body
-	);
-	
-	response.end();
+	else
+	{
+		response.statusCode = 200;
+		response.setHeader( 'Content-Type', 'text/html' );
+		//response.writeHead();
+		response.write( body );
+		response.end();
+	}
 };
 
 /**
@@ -283,6 +250,11 @@ renderer.prototype.decorate = function( fof, args, klay, memstring )
 			return this.date.getFullYear();
 		}break;
 		
+		case 'model':
+		{
+			return 'model';
+		}break;
+		
 		case 'html':
 		{
 			var subscript = args;
@@ -315,17 +287,42 @@ renderer.prototype.decorate = function( fof, args, klay, memstring )
 			// It must be a function, all objects accessible within the renderign tools are functions to be utilized
 			if( this.nk.type( requested_method ) === 'function' )
 			{
+				var modelparts = rargs[0].split( '.' );
+				if( modelparts[0] === 'model' )
+				{
+					// Make sure the reference is valid
+					if( modelparts[1] !== undefined || null )
+					{
+						if( klay.model.schema[modelparts[1]] !== undefined || null )
+						{
+							rargs[0] = [ modelparts[1], klay.model ];
+						}
+						else
+						{
+							console.log( 'Error: Unknown member: `[Model].' + modelparts[1] + '`.' );
+							rargs[0] = [ false, 'Unknown member:  `[Model].' + modelparts[1] + '`.' ];
+						}
+					}
+					else
+					{
+						rargs[0] = [ false, 'Unknown member:  `[Model].' + modelparts[1] + '`.' ];
+					}
+				}
+				
 				if( ( rargs[0] && rargs[1] ) !== undefined )
 				{	// Two args provided, parse second argument as a JSON string representation of an object
 					rargs[1] = JSON.parse( rargs[1] );
+					//console.log( '1: ' + rargs[0] + ', 2: ' + rargs[1] );
 					subscript = requested_method( rargs[0], rargs[1] );
 				}
 				else if( rargs[0] !== undefined )
 				{	// One arg provided
+					//console.log( '1: ' + rargs[0] + ', 2: ' + rargs[1] );
 					subscript = requested_method( rargs[0] );
 				}
 				else
 				{	// No args provided
+					//console.log( '1: ' + rargs[0] + ', 2: ' + rargs[1] );
 					subscript = requested_method();
 				}
 			}
@@ -336,28 +333,8 @@ renderer.prototype.decorate = function( fof, args, klay, memstring )
 				subscript = "";
 			}
 			
-			// The following snippet displays the methods that are parsed
-			var rstring = ""; 
-			for( var prop in rargs )
-			{
-				if( prop == 0 )
-				{
-					rstring += rargs[prop];
-				}
-				else
-				{
-					rstring += ', ' + rargs[prop];
-				}
-			}
-			//console.log( 'Method to run: \n' + fof + memstring + '\nArgs to pass: ' + rstring );
-			
-			// Now that we have our method and our arguments, we can actually invoke them.  With HTML factory, any second argument is an object of optional paramters.
-			// The first argument likely references any objects that the method should target (such as a model).
-			
-			//console.log( requested_method );
-			//requested_method( rargs[0], rargs[1] );
 			return String( subscript );
-		}
+		}break;
 		
 		default:
 		{

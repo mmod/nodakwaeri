@@ -28,7 +28,18 @@ function controller( config )
 controller.prototype.approach = function( request, response )
 {
 	// Get the request url
-	request.requrl = url.parse( request.url, true );
+	//request.requrl = url.parse( request.url, true );
+	
+	// Get the request method
+	var request_method;
+	if( request.method === 'POST' )
+	{
+		request_method = 'Post';
+	}
+	else
+	{
+		request_method = '';
+	}
 	
 	// Get the path
 	var path = request.requrl.pathname;
@@ -95,7 +106,7 @@ controller.prototype.approach = function( request, response )
 				requested_controller.config.view = parts[1];
 				
 				// Require the controller, and use the action term within the parts array to invoke the proper controller method
-				requested_controller[parts[1]]( request, response );
+				requested_controller[parts[1] + request_method]( request, response );
 			}break;
 			
 			default:
@@ -128,7 +139,7 @@ controller.prototype.approach = function( request, response )
 				requested_controller.config.view = parts[1];
 				
 				// Require the controller, and use the action term within the parts array to invoke the proper controller method
-				requested_controller[parts[1]]( request, response );
+				requested_controller[parts[1] + request_method]( request, response );
 			}break;
 		}
 	}
