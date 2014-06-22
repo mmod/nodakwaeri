@@ -5,7 +5,7 @@ Kwaeri for Node.js
 
 ## Installation
 
-To Install NodaKwaeri, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
+To Install nodakwaeri, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
 
 ```
 path_to_app/> npm install nk
@@ -23,7 +23,7 @@ nk = new nk();
 
 ## Usage
 
-Below describes some general usage of NodaKwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset.
+Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset.
 
 
 ### Checking the type of a variable
@@ -100,7 +100,7 @@ Which of course, when executed in node.js, should output:
 
 ### Boot-Strappage
 
-NodaKwaeri also provides all of the facilities one might need to create an application.  This includes:
+nodakwaeri also provides all of the facilities one might need to create an application.  This includes:
 
 Factory | Purpose
 --------|--------
@@ -111,7 +111,7 @@ Controller | Implements the MVC programming model.  Invokes the derived controll
 Renderer | Implements the MVC programming model.  Constructs XHTML for the response to the client, provides a fully featured scripting language for templating, and allows for shared layouts and powerful organization.  Developers define the application's views.
 HTML | Provides tools for generating HTML controls.
 
-The easiest way by far to boot-strap NodaKwaeri, involves creating a config file in the root of your application, and then passing it to the constructor for nk:
+The easiest way by far to boot-strap nodakwaeri, involves creating a config file in the root of your application, and then passing it to the constructor for nk:
 
 ```node
 var nk = require( 'nk' ),
@@ -143,4 +143,4 @@ app.init
 // Your application is now running...
 ```
 
-Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice), as well as for a more finished example of using NodaKwaeri for creating an application.  Browsing through the source will also provide additional details for customizing the toolset(s) and more.
+Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice), as well as for a more finished example of using nodakwaeri for creating an application.  Browsing through the source will also provide additional details for customizing the toolset(s) and more.
