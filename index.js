@@ -1,6 +1,6 @@
 /**
  * package: nodakwaeri
- * version:  0.0.2
+ * version: 0.0.3-alpha
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -27,7 +27,7 @@ function nk( config )
 // Component version string mapping
 nk.prototype._versionmap =
 {
-	"nodakwaeri": "0.0.2"
+	"nodakwaeri": "0.0.3-alpha"
 };
 
 // Object class to class type mapping

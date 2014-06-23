@@ -1,7 +1,7 @@
 {
   "name": "nk",
-  "version": "0.0.2",
-  "description": "NodaKwaeri, Kwaeri for Node.js",
+  "version": "0.0.3-alpha",
+  "description": "nodakwaeri, kwaeri for Node.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
