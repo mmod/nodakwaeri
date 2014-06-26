@@ -1,6 +1,6 @@
 /**
  * package: nodakwaeri
- * version: 0.0.3-alpha
+ * version: 0.0.4-alpha
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -27,7 +27,7 @@ function nk( config )
 // Component version string mapping
 nk.prototype._versionmap =
 {
-	"nodakwaeri": "0.0.3-alpha"
+	"nodakwaeri": "0.0.4-alpha"
 };
 
 // Object class to class type mapping
@@ -127,7 +127,6 @@ nk.prototype.extend = function( a, b )
 	return a;
 };
 
-
 /**
  * Executes a supplied method for each member of a supplied object or array
  * 
@@ -188,6 +187,7 @@ nk.prototype.init = function( o )
 		session_provider: 'nk',
 		routing_provider: 'nk',
 		controller_provider: 'nk',
+		db_provider: 'nk',
 		model_provider: 'nk',
 		view_provider: 'nk'
 	};
@@ -217,14 +217,28 @@ nk.prototype.init = function( o )
 		console.log( 'Using nk.router for routing' );
 	}
 	
+	// If a custom database provider wasn't provided, deploy the built in driver
+	if( o.db_provider === 'nk' )
+	{
+		o.db_provider = require( 'nk-mysql' );
+		console.log( 'Using nk-mysql for the data integration tools' );
+	}
+	
+	// If a custom model provider wasn't provided, deploy the built in facility
+	if( o.model_provider === 'nk' )
+	{
+		o.model_provider = new this.model( { db_provider: o.db_provider, database: this.config.database, type: this.type, extend: this.extend } );
+		console.log( 'Using nk.model for the application model provider' );
+	}
+	
 	// If a custom controller wasn't provided, deploy the built in controller initialized with the supplied controller path
 	if( o.controller_provider === 'nk' )
 	{
-		o.controller_provider = new this.controller( { controller_path: this.config.app.controller_path } );
+		o.controller_provider = new this.controller( { controller_path: this.config.app.controller_path, model_provider: o.model_provider } );
 		console.log( 'Using nk.controller for the application controller' );
 		
-		// we can also delete the controller_path variable now as we won't need it
-		//delete o.controller_path;
+		// we can also delete the model_provider variable now as we won't need it
+		delete o.model_provider;
 	}
 	
 	// If a custom renderer wasn't provided, add renderer_tools to the configuration
@@ -280,6 +294,8 @@ nk.prototype.session = require( "./library/session" );
 nk.prototype.router = require( "./library/router" );
 
 nk.prototype.controller = require( "./library/controller" );
+
+nk.prototype.model = require( "./library/model" );
 
 nk.prototype.renderer = require( "./library/renderer" );
 
