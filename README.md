@@ -1,6 +1,6 @@
-# nodakwaeri
+# nodakwaeri (nk)
 
-Kwaeri for Node.js
+A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
 
 ## Installation
@@ -14,7 +14,6 @@ path_to_app/> npm install nk
 If all went well, then you can use it inside of any node application:
 
 ```node
-var piece = "Try me now mofo.";
 var nk = require( 'nk' );
 nk = new nk();
 ...
@@ -23,7 +22,7 @@ nk = new nk();
 
 ## Usage
 
-Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset.
+Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset, as well as looking at the nk-mvc example by following the link at the bottom of this documentation.
 
 
 ### Checking the type of a variable
@@ -107,8 +106,9 @@ Factory | Purpose
 Server  | Defines and initialises the http server, listening for incoming client connections.  Utilizes the session and router factories.
 Session | Creates and manages all client sessions to provide persistence for the end user.
 Router  | Detects and processes media requests from the browser and/or routes client requests to the proper controller for further processing.
-Controller | Implements the MVC programming model.  Invokes the derived controller requested. Developers define the application's controllers.
-Renderer | Implements the MVC programming model.  Constructs XHTML for the response to the client, provides a fully featured scripting language for templating, and allows for shared layouts and powerful organization.  Developers define the application's views.
+Controller | Implements the MVC design pattern.  Invokes the derived controller requested. Developers define the application's controllers.
+Model | Implements the MVC design pattern.  Provides the interface to the data integration tools and database object.
+Renderer | Implements the MVC design pattern.  Constructs XHTML for the response to the client, provides a fully featured scripting language for templating, and allows for shared layouts and powerful organization.  Developers define the application's views.
 HTML | Provides tools for generating HTML controls.
 
 The easiest way by far to boot-strap nodakwaeri, involves creating a config file in the root of your application, and then passing it to the constructor for nk:
@@ -130,7 +130,8 @@ app.init
 (
 	{	
 	 	routes: <routes_configuration>,							// OR
-	 	router: new nk.router()
+	 	router: new nk.router(),
+	 	db_provider: <your custom provider>,
 	 	controller_path: __dirname + '/app/controllers',		// OR
 		controller_provider: new nk.controller( { 'controller_path': __dirname + '/app/controllers' } ),
 		model_path: __dirname + '/app/models',					// OR

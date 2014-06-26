@@ -1,7 +1,7 @@
 {
   "name": "nk",
-  "version": "0.0.3-alpha",
-  "description": "nodakwaeri, kwaeri for Node.js",
+  "version": "0.0.4-alpha",
+  "description": "nodakwaeri (nk): A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,9 +11,11 @@
     "url": "git://github.com/mmod/nodakwaeri.git"
   },
   "keywords": [
-    "NodaKwaeri",
     "nodakwaeri",
-    "nk"
+    "nk",
+    "application",
+    "framework",
+    "mvc"
   ],
   "author": "Richard Winters <rik@mmogp.com> (http://www.mmogp.com)",
   "license": "Apache V2.0",
