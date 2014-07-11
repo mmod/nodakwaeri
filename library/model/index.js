@@ -38,5 +38,12 @@ model.prototype.dbo = function()
 model.prototype.set = function( child )
 {
 	// We'll do it the old fashioned way
-	return this.extend( this, child );
+	for( var prop in child )
+	{
+		if( prop !== 'model' || 'dbo' || 'set' )
+		{
+			this[prop] = child[prop];
+		}
+	}
+	return this;
 };

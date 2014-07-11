@@ -20,342 +20,71 @@ function html( config )
 	html.prototype.nk = config;
 };
 
-html.prototype.version = function()
+html.prototype._classmap =
 {
-	return String( "0.0.1" );
+	label: "col-md-2 control-label",
+	textbox: "form-control",
+	password: "form-control",
+	textarea: "form-control",
+	select: "form-control",
+	multiselect: "form-control",
+	checkbox: "",
+	slider: "form-control",
+	radio: "form-control",
+	button: "btn ",
+	submit: "btn ",
+	validationmessage: ""
 };
 
-html.prototype.label = function( a1, a2 )
+html.prototype._version = function()
+{
+	return String( "0.0.5-alpha" );
+};
+
+html.prototype.generate = function ( t, a1, a2 )
 {
 	var args = {};
 	
-	// Check if we're using model values
+	// Check if we're using model/non-plain-text values
 	if( html.prototype.nk.type( a1 ) === 'array' )
 	{
 		if( a1[0] === false )
 		{
 			args['id'] = a1[1];
-			args['model'] = false;
+			args['npt'] = false;
 		}
 		else
 		{
 			args['id'] = a1[0];
-			args['model'] = a1[1];
+			args['npt'] = a1[1];
 		}
 	}
 	else
 	{
 		args['id'] = a1;
-		args['model'] = false;
+		args['npt'] = false;
 	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'label', args );
-};
-
-html.prototype.textbox = function( a1, a2 )
-{
-	var args = {};
 	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
 	if( a2 !== undefined )
 	{
 		html.prototype.nk.extend( args, a2 );
 	}
-	return html.prototype.construct( 'text', args );
-};
-
-html.prototype.password = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'password', args );
-};
-
-html.prototype.textarea = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'textarea', args );
-};
-
-html.prototype.select = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'select', args );
-};
-
-html.prototype.checkbox = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'checkbox', args );
-};
-
-html.prototype.radio = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'radio', args );
-};
-
-html.prototype.button = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'button', args );
-};
-
-html.prototype.submit = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'submit', args );
-};
-
-html.prototype.validationmessage = function( a1, a2 )
-{
-	var args = {};
-	
-	// Check if we're using model values
-	if( html.prototype.nk.type( a1 ) === 'array' )
-	{
-		if( a1[0] === false )
-		{
-			args['id'] = a1[1];
-			args['model'] = false;
-		}
-		else
-		{
-			args['id'] = a1[0];
-			args['model'] = a1[1];
-		}
-	}
-	else
-	{
-		args['id'] = a1;
-		args['model'] = false;
-	}
-	if( a2 !== undefined )
-	{
-		html.prototype.nk.extend( args, a2 );
-	}
-	return html.prototype.construct( 'validationmessage', args );
+	return html.prototype.construct( t, args );
 };
 
 html.prototype.construct = function( t, a )
 {
 	// Prep
-	var classmap =
-	{
-		label: "col-md-2 control-label",
-		text: "form-control",
-		password: "form-control",
-		textarea: "form-control",
-		select: "form-control",
-		"nk-select": "form-control",
-		radio: "form-control",
-		checkbox: "",
-		slider: "form-control",
-		button: "btn ",
-		submit: "btn ",
-	},
-	def = 
+	var def = 
 	{
 		id: a.id || "",
 		name: a.name || a.id || "",
 		rows: 10,
 		cols: 50,
 		value: "",
-		options: {
-					option1: "Option 1",
-					option2: "Option 2",
-					option3: "option 3"
-				 },
+		placeholder: "Enter value",
 		checked: false,
-		classes: classmap[t],
+		classes: html.prototype._classmap[t],
 		index: 0,
 		val: false,
 		valmsg: "Error"
@@ -368,18 +97,20 @@ html.prototype.construct = function( t, a )
 	{
 		case 'label':
 		{
-			if( a.model !== false )
+			if( a.npt !== false )
 			{
-				//for( var part in a.model.schema )
-				//{
-					//console.log( 'Schema [' + part + ']' );
-				//}
-				//console.log( 'Schema Identifier: ' + a.id );
-				a.value = a.model.schema[a.id][2];
+				if( a.npt.hasOwnProperty( 'schema' ) )
+				{	// Were using a model schema
+					a.value = a.npt.schema[a.id][2];
+				}
+				else
+				{	// Were using a viewbag value
+					a.value = a.npt;
+				}
 			}
 			else
-			{
-				console.log( 'No Schema [' + a.id + ']' );
+			{	// Were using the id as the value
+				//console.log( 'No Schema [' + a.id + ']' );
 				a.value = a.id;
 			}
 			
@@ -387,13 +118,13 @@ html.prototype.construct = function( t, a )
 			o = '<label class="' + a["classes"] + '" for="' + a["id"] + '">' + a.value + '</label>\n';
 		}break;
 		
-		case 'text':
+		case 'textbox':
 		case 'password':
 		case 'submit':
 		{
-			if( a.model !== false )
+			if( a.npt !== false )
 			{
-				a.value = a.model.schema[a.id][2];
+				a.value = a.npt;
 			}
 			else
 			{
@@ -409,6 +140,7 @@ html.prototype.construct = function( t, a )
 				if( t === 'password' )
 				{
 					tclass = " valid";
+					a.value = "";
 				}
 				o = '<input type="' + t + '" class="' + a["classes"] + tclass + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" placeholder="' + a["value"] + '" data-val="' + a["val"] + '" data-val-required="' + a["valmsg"] + '">\n';
 			}
@@ -416,9 +148,9 @@ html.prototype.construct = function( t, a )
 		
 		case 'textarea':
 		{
-			if( a.model !== false )
+			if( a.npt !== false )
 			{
-				a.value = a.model.schema[a.id][2];
+				a.value = a.npt;
 			}
 			else
 			{
@@ -436,21 +168,13 @@ html.prototype.construct = function( t, a )
 		
 		case 'select':
 		{
-			if( a.model !== false )
-			{
-				a.value = a.model.schema[a.id][2];
-			}
-			else
-			{
-				a.value = a.id;
-			}
 			if( !a["val"] )
 			{
 				o = '<select class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '">\n';
 				
-				for( var option in a["options"] )
+				for( var option in a.npt )
 				{
-					o += '<option value="' + a["options"][option] + '">' + option + '</a>\n';
+					o += '<option value="' + option + '">' + a.npt[option] + '</a>\n';
 				}
 				
 				o += '</select>\n';
@@ -459,16 +183,16 @@ html.prototype.construct = function( t, a )
 			{
 				o = '<select class="' + a["classes"] + '" id="' + a["id"] + '" name="' + a["name"] + '" tabindex="' + a["index"] + '" data-val="' + a["val"] + '" data-val-required="' + a["valmsg"] + '">\n';
 				
-				for( var option in a["options"] )
+				for( var option in a.npt )
 				{
-					o += '<option value="' + a["options"][option] + '">' + option + '</a>\n';
+					o += '<option value="' + option + '">' + a.npt[option] + '</a>\n';
 				}
 				
 				o += '</select>\n';
 			}
 		}break;
 		
-		case 'nk-select':
+		case 'multiselect':
 		{
 			o = '<div class="' + a['classes'] + ' nk-select" role="combobox" tabindex="' + a["index"] + '" aria-haspopup="true">\n' +
 		            '<div class="current">\n' +
@@ -477,7 +201,7 @@ html.prototype.construct = function( t, a )
 		            '<div class="list-container">\n' +
 		            	'<ol id="selectable" class="list">\n';
 		            	
-			for( var option in a["options"] )
+			for( var option in a.npt )
 			{
 				o += 		'<li class="ui-widget-content">' + option + '</li>\n';
 			}
@@ -492,9 +216,9 @@ html.prototype.construct = function( t, a )
 		
 		case 'button':
 		{
-			if( a.model !== false )
+			if( a.npt !== false )
 			{
-				a.value = a.model.schema[a.id][2];
+				a.value = a.npt;
 			}
 			else
 			{
@@ -506,12 +230,12 @@ html.prototype.construct = function( t, a )
 		case 'checkbox':
 		case 'radio':
 		{
-			if( a.model !== false )
+			if( a.npt !== false )
 			{
 				if( t === 'radio' )
 				{
 					// A radio is usually in a group of other radios, the values could be numeric or textual, and expand beyond a simple true false for the group.
-					a.value = a.model.schema[a.id][2];
+					a.value = a.npt;
 				}
 				else
 				{

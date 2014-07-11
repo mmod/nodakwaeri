@@ -220,7 +220,7 @@ nk.prototype.init = function( o )
 	// If a custom database provider wasn't provided, deploy the built in driver
 	if( o.db_provider === 'nk' )
 	{
-		o.db_provider = require( 'nk-mysql' );
+		o.db_provider = require( '../nodamysql' );
 		console.log( 'Using nk-mysql for the data integration tools' );
 	}
 	

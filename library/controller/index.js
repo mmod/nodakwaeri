@@ -95,6 +95,7 @@ controller.prototype.approach = function( request, response )
 				//requested_controller.renderer = this.config.view_provider;
 				requested_controller.config = this.config;
 				requested_controller.config.controller = 'home';
+				requested_controller.model = this.model;
 				
 				// The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
 				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
@@ -113,7 +114,6 @@ controller.prototype.approach = function( request, response )
 			default:
 			{
 				// Set some config references
-				//console.log( 'nah here' );
 				
 				// Get our requested controller
 				var controller_type = require( this.controller_path + '/' + parts[0] );
@@ -128,7 +128,8 @@ controller.prototype.approach = function( request, response )
 				//requested_controller.renderer = this.config.view_provider;
 				requested_controller.config = this.config;
 				requested_controller.config.controller = parts[0];
-				
+				requested_controller.model = this.model;
+
 				// The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
 				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
 				if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
@@ -136,9 +137,9 @@ controller.prototype.approach = function( request, response )
 					//console.log( 'Invalid view/action specified: ' + parts[1] + ', setting default: index' );
 					parts[1] = 'index';
 				}
-				
+
 				requested_controller.config.view = parts[1];
-				
+
 				// Require the controller, and use the action term within the parts array to invoke the proper controller method
 				requested_controller[parts[1] + request_method]( request, response );
 			}break;
@@ -147,7 +148,7 @@ controller.prototype.approach = function( request, response )
 	catch( error )
 	{
 		// And log the error ofc
-		console.log( 'Controller error: ' + error + ' ' + path );
+		console.log( 'Controller error: ' + error + ' ' + path + ' nk/library/controller/index.js - line 151' );
 		
 		// If the controller can't be loaded for some reason, handle the exception by showing a 404
 		require( './404' ).get( request, response );
