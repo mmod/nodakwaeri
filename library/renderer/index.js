@@ -1,7 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: renderer
- * version: 0.0.4-alpha
+ * version: 0.1.0
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -42,16 +42,8 @@ renderer.prototype.turn = function( request, response, klay )
 	var view_path = this.view_path;
 	var processor = this;
 	
-	//console.log( 'Rendering tools: ' + this.rendering_tools );
-	//console.log( 'View path: ' + this.view_path );
-	
-	//for( var prop in klay )
-	//{
-	//	console.log( 'Prop: ' + prop );
-	//}
-	
 	// Construct will check if there is a layout specified, and invoke parse accordingly.
-	if( klay.layout !== false )
+	if( klay.layout )
 	{
 		fs.readFile
 		( 
@@ -151,7 +143,6 @@ renderer.prototype.turn = function( request, response, klay )
 
 /**
  * Pieces together - and sends - the response
- * 
  */
 renderer.prototype.shape = function( request, response, klay )
 {
@@ -161,12 +152,13 @@ renderer.prototype.shape = function( request, response, klay )
 	body = this.parse( body, klay );
 	
 	// If a layout was requested, let's prep it
-	if( klay.layout !== false )
+	if( klay.layout )
 	{
 		klay.view = body;
 		var view = klay.layout;
 		view = this.parse( view, klay );
 
+		response.setSession( request.session );
 		response.statusCode = 200;
 		response.setHeader( 'Content-Type', 'text/html' );
 		//response.writeHead();
@@ -175,6 +167,7 @@ renderer.prototype.shape = function( request, response, klay )
 	}
 	else
 	{
+		response.setSession( request.session );
 		response.statusCode = 200;
 		response.setHeader( 'Content-Type', 'text/html' );
 		//response.writeHead();
@@ -197,24 +190,16 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 	{
 		iteration = false;
 	}
-	else
-	{
-		console.log( 'Yea, iteration was passed: ' + iteration );
-	}
 	
 	if( !identification )
 	{
 		identification = false;
 	}
-	else
-	{
-		console.log( 'Yea, identifier was passed: ' + identification );
-	}
 	
 	var processor = this,
 	o = content
 	.replace // First strip all comments
-	(	/[^:](\/\/[^\r\n]*)[\r\n]|(\/\*(.*)\*\/)*/mg,
+	(	/[^:"](\/\/[^\r\n]*)[\r\n]|(\/\*(.*)\*\/)*/mg,
 		function( match, singline, multiline, extra )
 		{	
 			return "";
@@ -225,10 +210,9 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 		function( match, subscript, codeflow, fof, memflow, memstring, member, argflow, args, ssflow, superscript )
 		{
 		
-			console.log( fof );
+			//console.log( fof );
 			if( fof === 'foreach' )
 			{
-				console.log( 'Foreach' );
 				var found = false,
 				pieces = false,
 				iterator = false,
@@ -289,13 +273,11 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 						
 						if( identifier )
 						{
-							console.log( 'None are false or undefined or null line 284' );
-							so = processor.parse( superscript, klay, iterator, identifier );
+							so += processor.parse( superscript, klay, klay.viewbag[iterator][record], identifier );
 						}
 						else
 						{
-							console.log( 'Identifier not found' );
-							so = processor.parse( superscript, klay, iterator, false );
+							so += processor.parse( superscript, klay, klay.viewbag[iterator][record], false );
 						}
 					}
 					return so;
@@ -307,24 +289,20 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 			
 			if( fof === 'html' )
 			{
-				console.log( 'Match: ' + args );
 				// Here we need to apply logic for filtering iterated parses
 				if( iteration  )
 				{
 					if( identification )
 					{
-						console.log( 'In this part, line 306' );
 						return processor.decorate( fof, args, klay, memstring, iteration, identification );
 					}
 					else
 					{
-						console.log( 'In this part, line 311' );
 						return processor.decorate( fof, args, klay, memstring, iteration, false );
 					}
 				}
 				else
 				{
-					//console.log( 'html' );
 					return processor.decorate( fof, args, klay, memstring, false, false );
 				}
 			}
@@ -333,12 +311,10 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 			{
 				if( identification )
 				{
-					//console.log( 'In this part, line 325' );
 					return processor.decorate( codeflow, codeflow, klay, "", iteration, identification );
 				}
 				else
 				{
-					console.log( 'In this part, ' + codeflow + ' ' + klay + ' ' + iteration + ' line 330' );
 					return processor.decorate( codeflow, codeflow, klay, "", iteration, false );
 				}
 			}
@@ -357,6 +333,8 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
  */
 renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, identification )
 {
+	var processor = this;
+	
 	if( !iteration )
 	{
 		iteration = false;
@@ -366,8 +344,6 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
 	{
 		iteration = false;
 	}
-	
-	var processor = this;
 	
 	// Returns the output of the subscript
 	switch( fof )
@@ -409,18 +385,14 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
 			rargs = {},
 			control = 0;
 			
-			console.log( 'In HTML case: ' + subscript );
-			
 			// Strip our arguments
 			subscript = subscript
 			.replace	//(((([a-zA-Z0-9_]*)(\.([a-zA-Z0-9_]*))*(\((.*)\))?[\}]?)|([\{](.*)\}))[\,]?)*/mg,
 			(	/(((([a-zA-Z0-9_]*)(\.([a-zA-Z0-9_]*))*(\((.*)\))?[\}]?)|([\{](.*)\}))[\,]?)*/mg,
 				function( match, match2, match3, noobjarg, method, memflow, member, argflow, argstring, objarg, objcontents  )
 				{
-					//console.log( match3 );
 					if( match3 )
 					{
-						console.log( 'Found args: ' + match3 );
 						rargs[control] = match3;
 						control++;
 					}
@@ -457,7 +429,6 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
 				}
 				else
 				{	// We'll literally pass what is requested from the viewbag
-					 //console.log( 'Argument: ' + memberparts[0] );
 					if( klay.viewbag )
 					{
 						if( klay.viewbag.hasOwnProperty( memberparts[0] ) )
@@ -539,15 +510,19 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
 				{
 					if( fof )
 					{
-						// It's most likely requesting some information from the viewbag :)
-						console.log( fof + ' ' + iteration + ' ' + identification );
-						
+						// We're already iterating over a viewbag item, the identification let's us know what word was used to signify the current iteration.
 						var vbag = fof.split( "." );
-						if( vbag[0] === identification )
+						//console.log( 'First is: ' + vbag[0] + ', and second is: ' + vbag[1] + ', and Identification is: ' + identification );
+						if( vbag[0].toString == identification.toString )
 						{
-							if( klay.viewbag.hasOwnProperty( vbag[0] ) )
+							//console.log( 'Were in here' );
+							if( iteration.hasOwnProperty( vbag[1] ) )
 							{
 								return iteration[vbag[1]];
+							}
+							else
+							{
+								return 'Does not exist: ' + iteration + '[' + vbag[1] + ']';
 							}
 						}
 					}
