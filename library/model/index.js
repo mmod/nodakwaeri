@@ -1,7 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: model
- * version: 0.0.4-alpha
+ * version: 0.1.1
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -38,5 +38,12 @@ model.prototype.dbo = function()
 model.prototype.set = function( child )
 {
 	// We'll do it the old fashioned way
-	return this.extend( this, child );
+	for( var prop in child )
+	{
+		if( prop !== 'model' || 'dbo' || 'set' )
+		{
+			this[prop] = child[prop];
+		}
+	}
+	return this;
 };

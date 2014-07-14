@@ -5,7 +5,10 @@ A simple, yet powerful, and fully-featured cross-platform application framework 
 
 ## Installation
 
-To Install nodakwaeri, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
+Unless you are only planning on using a few pieces of nodakwaeri and intend to use custom facilities, it's recommended that you install nodakwaeri via the nk-mvc project template.  There is more in-depth documentation available for [nk-mvc](http://www.github.com/mmod/nk-mvc/) which covers all aspects of the framework, and provides an excellent starting place for any nodakwaeri application. 
+
+
+To install the nodakwaeri module without the project template, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
 
 ```
 path_to_app/> npm install nk
@@ -22,7 +25,7 @@ nk = new nk();
 
 ## Usage
 
-Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset, as well as looking at the nk-mvc example by following the link at the bottom of this documentation.
+Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset.
 
 
 ### Checking the type of a variable
@@ -97,7 +100,7 @@ Which of course, when executed in node.js, should output:
 ```
 
 
-### Boot-Strappage
+### Boot-Strapped
 
 nodakwaeri also provides all of the facilities one might need to create an application.  This includes:
 
@@ -106,12 +109,15 @@ Factory | Purpose
 Server  | Defines and initialises the http server, listening for incoming client connections.  Utilizes the session and router factories.
 Session | Creates and manages all client sessions to provide persistence for the end user.
 Router  | Detects and processes media requests from the browser and/or routes client requests to the proper controller for further processing.
+Cryptography | nodakwaeri is bootstrapped with [The Stanford Javascript Crypto Library](http://crypto.stanford.edu/sjcl/), via their [BSD License](https://github.com/bitwiseshiftleft/sjcl/blob/master/README/bsd.txt).
 Controller | Implements the MVC design pattern.  Invokes the derived controller requested. Developers define the application's controllers.
-Model | Implements the MVC design pattern.  Provides the interface to the data integration tools and database object.
+Model | Implements the MVC design pattern.  Provides the interface to the data integration tools and database object.  Developers define the application's models.
 Renderer | Implements the MVC design pattern.  Constructs XHTML for the response to the client, provides a fully featured scripting language for templating, and allows for shared layouts and powerful organization.  Developers define the application's views.
-HTML | Provides tools for generating HTML controls.
+HTML | Provides tools for generating commonly used HTML5 controls in Accessible Rich Internet Applications (ARIA).
 
-The easiest way by far to boot-strap nodakwaeri, involves creating a config file in the root of your application, and then passing it to the constructor for nk:
+<i>As a side note, by default nk-mvc makes uses of nodamysql ([nk-mysql](https://github.com/mmod/nodamysql)) as a database provider, and the included template uses Bootstrap(which includes Normalize) and jQuery via CDN.</i>
+
+nodakwaeri is designed to work out of the box using a config file from the root of your application:
 
 ```node
 var nk = require( 'nk' ),
@@ -144,4 +150,4 @@ app.init
 // Your application is now running...
 ```
 
-Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice), as well as for a more finished example of using nodakwaeri for creating an application.  Browsing through the source will also provide additional details for customizing the toolset(s) and more.
+Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice).

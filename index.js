@@ -1,14 +1,15 @@
 /**
  * package: nodakwaeri
- * version: 0.0.4-alpha
+ * version: 0.1.0
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
 
 // Deps
-var http = require( 'http' );
-var env = process.env.NODE_ENV;
+var http = require( 'http' ),
+	sjcl = require( './crypt/sjcl' ),
+	env = process.env.NODE_ENV
 
 if( env === ( "" || null ) )
 {
@@ -24,10 +25,10 @@ function nk( config )
 	this.config.debug = ( env === "development" ) ? true : false;
 };
 
-// Component version string mapping
+// Component version string
 nk.prototype._versionmap =
 {
-	"nodakwaeri": "0.0.4-alpha"
+	"nodakwaeri": "0.0.5-alpha"
 };
 
 // Object class to class type mapping
@@ -178,6 +179,27 @@ nk.prototype.each = function( o, f )
 	return false;
 };
 
+nk.prototype.hash = function( data, light, algo )
+{
+	var bitarray;
+	
+	if( light )
+	{
+		bitarray = sjcl.hash.sha1.hash( data );
+		
+		return sjcl.codec.hex.fromBits( bitarray );
+	}
+	
+	bitarray = sjcl.hash.sha256.hash( data );
+	
+	return sjcl.codec.hex.fromBits( bitarray );
+};
+
+/**
+ * Starts the application
+ * 
+ * @param o
+ */
 nk.prototype.init = function( o )
 {	
 	// Set the defaults for those who wish to use NodaKwaeri to its
@@ -196,7 +218,7 @@ nk.prototype.init = function( o )
 	// Make sure the paths were provided, they have to be because of the fact that __dirname in this
 	// file will not point to the proper directories for the application being created using this
 	// framework
-	if( ( this.config.app.controller_path || this.config.app.model_path || this.config.app.view_path || this.config.app.asset_path ) === ( null || undefined )  )
+	if( !this.config.app.controller_path || !this.config.app.model_path || !this.config.app.view_path || !this.config.app.asset_path  )
 	{
 		console.error( 'MVC and Asset paths must be set.' );
 		
@@ -220,7 +242,7 @@ nk.prototype.init = function( o )
 	// If a custom database provider wasn't provided, deploy the built in driver
 	if( o.db_provider === 'nk' )
 	{
-		o.db_provider = require( 'nk-mysql' );
+		o.db_provider = require( '../nodamysql' );
 		console.log( 'Using nk-mysql for the data integration tools' );
 	}
 	
@@ -276,12 +298,6 @@ nk.prototype.init = function( o )
 	// Let's update the configuration to handle dependencies further along the asynchronous chain of our application loop.
 	config = this.extend( this.config, o );
 	
-	//for( var property in config )
-	//{
-	//	console.log( property );
-	//}
-	//console.log( config.server.port );
-	
 	// Initialize our server with the updated configuration
 	var server = new this.server( config );
 	server.start();
@@ -299,5 +315,4 @@ nk.prototype.model = require( "./library/model" );
 
 nk.prototype.renderer = require( "./library/renderer" );
 
-// Loads the rendering tools component
 nk.prototype.html = require( "./library/html" );

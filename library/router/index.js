@@ -1,7 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: router
- * version: 0.0.4-alpha
+ * version: 0.1.1
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -26,7 +26,10 @@ function router( config )
 	delete config.session_provider;
 	delete config.controller_provider;
 	
+	// Start the session provider
 	this.sessions = new session_provider( config );
+	console.log( 'Starting the session service' );
+	this.sessions.start();
 	
 	// Set the controller's configuration
 	this.controller.config = config;
@@ -42,7 +45,7 @@ router.prototype.route = function( request, response )
 	
 	// Get the path
 	var path = request.requrl.pathname;
-	
+
 	// Get the referrer
 	var referer = request.headers.referer;
 	
@@ -52,6 +55,8 @@ router.prototype.route = function( request, response )
 	// so that we do not get accidental matches from a path-naming coincidence.  We also suggest that there
 	// could be another period at the end of the string followed by either gz, bz2, or map (css.map).  This covers most media types
 	var mediaType = path.match( /\.(css|less|js|ttf|woff|ico|bmp|jpe?g|png|json|xml|text|zip|tar)\.?(gz|bz2|map)?$/ );
+	
+	//console.log( referer + ' - ' + mediaType );
 	
 	// JS files are sometimes fetched as media (e.g. from a script element, defined in the src attribute).  When this happens
 	// we will ALWAYS have a referer (that is a string value of the path to the page making the request).  When there is no
@@ -170,14 +175,14 @@ router.prototype.route = function( request, response )
 		fs.readFile
 		( 
 			assets + path,			// __dirname is always the location of the file it is used in without a trailing slash
-			'utf8',								// Yep, always utf-8
+			'binary',								// Yep, always binary
 			function( error, data )
 			{
 				// If there is an error
 				if( error )
 				{
 					// Log it
-					console.log( 'Error reading asset or resource.' );
+					console.log( 'Error reading asset or resource: ' + assets + path + '. [Router:180]' );
 					
 					// If we have set logic to throw an exception
 					if( dothrow )
@@ -192,7 +197,7 @@ router.prototype.route = function( request, response )
 				else
 				{
 					// If there are no errors, respond with the asset/resource
-					response.write( data, 'utf8' );
+					response.write( data, 'binary' );
 					response.end();
 				}
 			}

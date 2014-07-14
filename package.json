@@ -1,6 +1,6 @@
 {
   "name": "nk",
-  "version": "0.0.4-alpha",
+  "version": "0.1.1",
   "description": "nodakwaeri (nk): A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/mmod/nodakwaeri.git"
+  },
+  "dependencies": {
   },
   "keywords": [
     "nodakwaeri",
