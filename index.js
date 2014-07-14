@@ -8,7 +8,7 @@
 
 // Deps
 var http = require( 'http' ),
-	sjcl = require( '../sjcl' ),
+	sjcl = require( './crypt/sjcl' ),
 	env = process.env.NODE_ENV
 
 if( env === ( "" || null ) )

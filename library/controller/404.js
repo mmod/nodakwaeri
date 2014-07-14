@@ -2,7 +2,7 @@
  * 404.js
  * 
  * package: MMod-Node
- * version: 0.0.4-alpha
+ * version: 0.1.1
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MassivelyModified</a>
  * copyright: 2013-2014 Richard B. Winters
  */
