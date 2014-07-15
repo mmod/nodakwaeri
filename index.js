@@ -1,6 +1,6 @@
 /**
  * package: nodakwaeri
- * version: 0.1.2
+ * version: 0.1.3
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -28,7 +28,7 @@ function nk( config )
 // Component version string
 nk.prototype._versionmap =
 {
-	"nodakwaeri": "0.0.5-alpha"
+	"nodakwaeri": "0.1.3"
 };
 
 // Object class to class type mapping
@@ -242,7 +242,7 @@ nk.prototype.init = function( o )
 	// If a custom database provider wasn't provided, deploy the built in driver
 	if( o.db_provider === 'nk' )
 	{
-		o.db_provider = require( '../nodamysql' );
+		o.db_provider = require( 'nk-mysql' );
 		console.log( 'Using nk-mysql for the data integration tools' );
 	}
 	

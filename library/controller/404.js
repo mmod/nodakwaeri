@@ -2,7 +2,7 @@
  * 404.js
  * 
  * package: MMod-Node
- * version: 0.1.2
+ * version: 0.1.3
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MassivelyModified</a>
  * copyright: 2013-2014 Richard B. Winters
  */
@@ -58,7 +58,7 @@ exports.get = function( request, response )
 			        '<div class="container-fluid">' +
 				        '<div class="panel">' +
 						    '<section id="showcase">' +
-						    	'<div class="jumbotron">' +
+						    	'<div class="jumbotron errbla">' +
 						    		'<center>' +
 						    			'<h1>Too bad!</h1>' +
 					            		'<p>The resource requested could not be processed...</p>' +
