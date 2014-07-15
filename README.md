@@ -151,3 +151,18 @@ app.init
 ```
 
 Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice).
+
+
+## Development
+
+Feel free to fork the repository and submit pull requests. Browse any of our other repositories as well http://github.com/mmod.
+
+
+### Created with:
+
+[Eclipse Kepler](https://www.eclipse.org/downloads/)
+
+[Nodeclipse](https://github.com/Nodeclipse/nodeclipse-1)
+ ([Eclipse Marketplace](http://marketplace.eclipse.org/content/nodeclipse), [site](http://www.nodeclipse.org))
+
+[Node.js](http://nodejs.org)
