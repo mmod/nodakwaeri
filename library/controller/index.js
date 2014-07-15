@@ -1,7 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: controller
- * version: 0.1.3
+ * version: 0.1.4
  * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -129,6 +129,7 @@ controller.prototype.approach = function( request, response )
 				requested_controller.config = this.config;
 				requested_controller.config.controller = parts[0];
 				requested_controller.model = this.model;
+				
 
 				// The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
 				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
