@@ -1,4 +1,4 @@
-# nodakwaeri ( nk $Id:$ )
+# nodakwaeri ( nk v0.2.0 )
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
