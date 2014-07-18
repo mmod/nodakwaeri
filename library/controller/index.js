@@ -1,8 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: controller
- * version: 0.1.3
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
@@ -80,19 +79,11 @@ controller.prototype.approach = function( request, response )
 			case '/':
 			case '/home':
 			{
-				//console.log( 'here' );
-
 				// Get our requested controller
 				var controller_type = require( this.controller_path + '/home' );
 				var requested_controller = new controller_type();
-				//for( var prop in requested_controller )
-				//{
-				//	console.log( 'Prop: ' + prop );
-				//}
 				
-				// Set the controller's renderer
-				
-				//requested_controller.renderer = this.config.view_provider;
+				requested_controller.controller_path = this.controller_path;
 				requested_controller.config = this.config;
 				requested_controller.config.controller = 'home';
 				requested_controller.model = this.model;
@@ -101,7 +92,6 @@ controller.prototype.approach = function( request, response )
 				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
 				if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
 				{
-					//console.log( 'Invalid view/action specified: ' + parts[1] + ', setting default: index' );
 					parts[1] = 'index';
 				}
 				
@@ -113,19 +103,11 @@ controller.prototype.approach = function( request, response )
 			
 			default:
 			{
-				// Set some config references
-				
 				// Get our requested controller
 				var controller_type = require( this.controller_path + '/' + parts[0] );
 				var requested_controller = new controller_type();
-				//for( var prop in requested_controller )
-				//{
-				//	console.log( 'Prop: ' + prop );
-				//}
-				
-				// Set the controller's renderer
-				
-				//requested_controller.renderer = this.config.view_provider;
+
+				requested_controller.controller_path = this.controller_path;
 				requested_controller.config = this.config;
 				requested_controller.config.controller = parts[0];
 				requested_controller.model = this.model;
@@ -134,7 +116,6 @@ controller.prototype.approach = function( request, response )
 				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
 				if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
 				{
-					//console.log( 'Invalid view/action specified: ' + parts[1] + ', setting default: index' );
 					parts[1] = 'index';
 				}
 

@@ -1,8 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: router
- * version: 0.1.3
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
@@ -42,6 +41,7 @@ router.prototype.route = function( request, response )
 	
 	// Get the request url
 	request.requrl = url.parse( request.url, true );
+	//console.log( 'Method: ' + response.method );
 	
 	// Get the path
 	var path = request.requrl.pathname;

@@ -1,8 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: renderer
- * version: 0.1.3
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
@@ -158,8 +157,26 @@ renderer.prototype.shape = function( request, response, klay )
 		var view = klay.layout;
 		view = this.parse( view, klay );
 
-		response.setSession( request.session );
+		//for( var m in request.session )
+		//{
+		//	console.log( m + ': ' + request.session[m] );
+		//	if( m == 'data' )
+		//	{
+		//		for( var d in request.session[m] )
+		//		{
+		//			if( d == 'name' )
+		//			{
+		//				console.log( d + ': ' + request.session[m][d].first + ' ' + request.session[m][d].last );
+		//			}
+		//			else
+		//			{
+		//				console.log( d + ': ' + request.session[m][d] );
+		//			}
+		//		}
+		//	}
+		//}
 		response.statusCode = 200;
+		response.setSession();
 		response.setHeader( 'Content-Type', 'text/html' );
 		//response.writeHead();
 		response.write( view );
@@ -167,8 +184,8 @@ renderer.prototype.shape = function( request, response, klay )
 	}
 	else
 	{
-		response.setSession( request.session );
 		response.statusCode = 200;
+		response.setSession();
 		response.setHeader( 'Content-Type', 'text/html' );
 		//response.writeHead();
 		response.write( body );
@@ -538,7 +555,7 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
 			{
 				if( fof )
 				{
-					return fof;
+					return klay.viewbag[fof];
 				}
 				
 				return '';

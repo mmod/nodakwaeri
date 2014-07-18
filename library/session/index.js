@@ -1,8 +1,7 @@
 /**
  * package: nodakwaeri
  * sub-package: session
- * version: 0.1.3
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
@@ -38,76 +37,113 @@ function session( config )
  */
 session.prototype.find = function( request, response, callback )
 {
-	var id,
+	var cookies,
 		cfg = {},
 		ts = new Date(),
-		stamp;
+		stamp,
+		expired = false;
 	
-	// Start by grabbing the Session Id from the request
-	id = this.getId( request );
+	// Start by parsing the cookies
+	cookies = this.getCookies( request );
+	cookies.id = cookies.id || this.genId();
+	cookies.uk = cookies.uk || this.genId();
+	
 	stamp = ts.setTime( ts.getTime() + ( 15 * 60 * 1000 ) );
+	//console.log( 'Current session: ' + cookies.id );
 	
-	// Now check for the session by Id from the session store
-	if( store.hasOwnProperty( id ) )
-	{	// If it exists, and its not expired set the client session to that instance
-		store[id].expires = stamp;
+	// Now check for the session by Id from the session store, and make sure the uk matches in order to further help in avoiding session take-over
+	if( store.hasOwnProperty( cookies.id ) && store[cookies.id].uk === cookies.uk )
+	{	
+		// Grab the current cookie expiration from the session store and then update the value to the new stamp.
+		var cstamp = new Date( store[cookies.id].expires );
+		store[cookies.id].expires = stamp;
+		
+		// If the session store's time stamp had expired, it just means the session cleanup cycle hasn't run, let's make sure to set
+		// the authenticated value to false so that it is updated on the client's side.
+		if( ts > cstamp )
+		{
+			store[cookies.id].authenticated = false;
+		}
 	}
 	else
-	{	// Otherwise create a new session using the cookie provided Id or new session Id that was generated
-		cfg['id'] = id;
-		cfg['host'] = this.config.url;
-		cfg['expires'] = stamp;
-		cfg['data'] = session.prototype.getDataCookie( request );
-		cfg.data['authenticated'] = false;
-		store[id] = new clientSession( cfg );
-		request.session = store[id];
+	{	// Otherwise create a new session using the cookie provided Id or new session Id that was generated. There is a chance that the session id 
+		// existed in the store, but that the uk didn't match - we don't want to overwrite anyone's active session
+		while( store.hasOwnProperty( cookies.id ) )
+		{
+			cookies.id = this.genId();		
+		}
+		
+		cfg.id = cookies.id;
+		cfg.uk = cookies.uk;
+		cfg.host = this.config.url;
+		cfg.expires = stamp;
+		cfg.authenticated = false;
+		store[cookies.id] = new clientSession( cfg );
 	}
-	
-	// We must fetch the latest cookies
-	store[id].data = this.getDataCookie( request );
 	//console.log( JSON.stringify( store[id].data ) );
 	
-	// And pass the session along to our application code
-	request.session = store[id];
-	response.setSession = session.prototype.set;
-	response.setCookieHeader = session.prototype.setCookieHeader;
+	// We pass a copy of the client in the request, as well as the accepted cookies, and a method to fetch them
+	request.session = {};
+	request.session.client = store[cookies.id];
+	request.session.cookies = cookies;
+	request.session.get = session.prototype.get;
+	request.isAuthenticated = session.prototype.isAuthenticated;
+	
+	// We create an empty cookies member for allowing cookies to be set, then attach a method to do just that, as well as construct and send the headers
+	response.session = {};
+	response.session.tools = this.config.rendering_tools;	// Add these tools for the set function;
+	response.session.id = cookies.id;
+	response.session.uk = cookies.uk;
+	response.session.url = store[cookies.id].host;
+	response.session.cookies = [];
+	response.session.genExpirationDate = session.prototype.genExpirationDate; 
+	response.session.set = session.prototype.set;
+	response.session.set( 'sid', JSON.stringify( { i: cookies.id, d: cookies.uk } ), { secure: true } );
+	response.setSession = session.prototype.setSession;
+	response.redirect = session.prototype.redirect;
 	
 	callback( request, response );
 };
 
-/**
- * Parses the request object for the 'id' cookie header.
- * 
- * NOTE: If a session identifier does not exist within the cookie header, or if the session identifier
- * 		 is not found, we generate a new session identifier
- * 
- * @param request
- * 
- * @return String
- * 
- * @since 0.0.1
- */
-session.prototype.getId = function( request )
+session.prototype.getCookies = function( request )
 {
-	// Parse the request object, fetching the cookie header 'SID'
-	// If the SID cookie header does not exist we generate a new session id and then respond to the client with the
-	// appropriate response headers set.
+	// We start by splitting the string by ';'...the last one doesn't need to have one :)
+	var cstring,
+		cookies = {};
 	if( request.headers.cookie )
 	{
-		// Parse the Session Id (SID) cookie header
-		var header = /SID=([a-zA-Z0-9\-]*)[\s\,\;]/g.exec( request.headers.cookie );
-
-		//console.log( 'Cookie! ' + header[1] );
+		//console.log( 'Theres cookies!: ' + request.headers.cookie );
+		var cstring = request.headers.cookie.toString();
+		cstring = cstring.split( ';' );
 		
-		return header[1];
+		// We have an array of strings, each with an =
+		for( var key in cstring )
+		{
+			var i = cstring[key].split( '=' );
+			if( i )
+			{
+				// Remove any leading spaces from the keys
+				i[0] = i[0].replace( ' ', '' );
+				
+				// Now we have a single cookie key and value
+				if( i[0] == 'sid' )
+				{
+					var ids = JSON.parse( i[1] );
+					cookies.id = ids.i;
+					cookies.uk = ids.d;
+					//console.log( 'The SID = ' + cookies.id );
+					//console.log( 'The DIFFERENTIAL = ' + cookies.uk );
+				}
+				else
+				{
+					cookies[i[0]] = i[1];
+				}
+				//console.log( 'Cookie: ' + i[0] + ', Val: ' + i[1] );
+			}
+		}
 	}
-	else
-	{
-		// First generate our Session Id 
-		// By the way - Thank you Jeff Ward, for the performance, and the saved time! http://stackoverflow.com/a/21963136
-		//console.log( 'Creating new SID' );
-		return this.genId();
-	}
+	
+	return cookies;
 };
 
 /**
@@ -130,50 +166,9 @@ session.prototype.genId = function()
 			lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
 };
 
-/**
- * Gets the 'data' cookie
- * 
- * @param request
- * @returns
- * 
- * @since 0.0.5-alpha
- */
-session.prototype.getDataCookie = function( request )
+session.prototype.isAuthenticated = function()
 {
-	if( request.headers.cookie )
-	{
-		var data = /data=(\{(.*)\})/g.exec( request.headers.cookie );
-		
-		if( data )
-		{
-			if( data.length > 1 )
-			{
-				return JSON.parse( data[1] );
-			}
-		}
-	}
-	
-	return { username: 'Guest' }
-};
-
-/**
- * Returns a fixed array of cookie headers
- * 
- * @param id	Session Identifier
- * 
- * @return array	Array of strings (cookie headers)
- * 
- * @since 0.0.1
-*/	
-session.prototype.setCookieHeader = function( client )
-{
-	return 	[
-			 	'SID=' + client.id,
-			 	'domain=' + client.host,
-			 	'path=' + client.path,
-			 	'expires=' + session.prototype.genExpirationDate( 30 ),		// We'll set it for 30 days later if remember me is checked when a user logs in.
-			 	'data=' + JSON.stringify( client.data )
-			];
+	return this.client.authenticated;
 };
 
 /**
@@ -190,7 +185,7 @@ session.prototype.genExpirationDate = function( minutes )
 	var d = new Date();
 	d.setTime( d.getTime() + ( minutes * 60 * 1000 ) );
 	
-	return d.toGMTString();
+	return d.toUTCString();
 };
 
 /**
@@ -200,19 +195,86 @@ session.prototype.genExpirationDate = function( minutes )
  */
 session.prototype.start = function( options )
 {
-	// For now we will default the timer to every 15 minutes.
+	// For now we will default the timer to every 5 minutes.
 	timestamp = new Date();
 	this.cleanup( ( 5*60*1000 ) );
 };
 
 /**
- * Sets a Data/session
+ * Sets a Data/session variable
  * 
  * @since 0.0.5-alpha
  */
-session.prototype.set = function( client )
+session.prototype.set = function( name, value, options )
 {
-	this.setHeader( 'Set-Cookie', this.setCookieHeader( client.id ) );
+	var nk = this.tools,
+	def =
+	{
+		host: this.url,
+		path: '/',
+		secure: false,
+		expires: this.genExpirationDate( 30 )
+	},
+	o = nk.extend( options || {}, def );
+	
+	if( o.secure )
+	{
+		o.secure = 'HttpOnly';
+	}
+	
+	if( name && value )
+	{
+		this.cookies.push( name + '=' + value + '; host=' + o.host + '; path=' + o.path + '; expires=' + o.expires + '; ' + o.secure );
+		//console.log( 'Setting: ' + name + '=' + value + '; host=' + o.host + '; path=' + o.path + '; expires=' + o.expires + '; ' + o.secure );
+		return true;
+	}
+	
+	return false;
+};
+
+/**
+ * Gets a Data/session variable
+ * 
+ * @since 0.0.5-alpha
+ */
+session.prototype.get = function( name, def )
+{
+	if( name )
+	{
+		if( this.cookies.hasOwnProperty( name ) )
+		{
+			return this.cookies[name];
+		}
+	}
+	
+	if( def )
+	{
+		return def;
+	}
+};
+
+/**
+ * Sets the sessions cookies
+ * 
+ * @since 0.0.5-alpha
+ */
+session.prototype.setSession = function()
+{
+	this.setHeader( 'Set-Cookie', this.session.cookies );
+};
+
+/**
+ * Sends a redirect header to the client
+ * 
+ * @param path
+ */
+session.prototype.redirect = function( path )
+{
+	//this.method = 'HEAD';
+	this.statusCode = 302;
+	this.setSession();
+	this.setHeader( 'Location', path );
+	this.end( '<p>Please wait while we redirect you.</p>' );
 };
 
 /**
@@ -231,32 +293,12 @@ session.prototype.cleanup = function( delay )
 	{
 		for( var client in store )
 		{
-			console.log( '\n' );
-			console.log( 'Session-' + count + ': ' + client );
-			for( var member in store[client] )
-			{
-				console.log( '[S' + count + '] ' + member + ': ' + store[client][member] );
-				if( member == 'data' )
-				{
-					for( var param in member )
-					{
-						console.log( 'In our client: ' + param + ', with a value of: ' + member[param] );
-					}
-				}
-			}
-
 			stamp = new Date( store[client].expires );
 			if( ts > stamp  )
 			{
-				console.log( client + ' is inactive for too long, removing session.' );
 				session.prototype.destroy( client );
 			}
-			else
-			{
-				console.log( 'It is: ' + ts + '. ' + store[client].id + ' is still active until ' + stamp + ', not destroying session.' );
-			}
 			
-			console.log( '\n' );
 			count++;
 		}
 	}
@@ -286,9 +328,9 @@ var clientSession;
 function clientSession( config )
 {
 	this.id = config.id;
-	this.expires = config.expires
-	this.data = config.data;
+	this.uk = config.uk;
 	this.host = config.host;
 	this.path = config.path || '/';
 	this.persistent = config.persistent || true;
+	this.expires = config.expires;
 };
