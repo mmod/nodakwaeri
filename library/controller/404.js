@@ -1,10 +1,9 @@
 /**
- * 404.js
- * 
- * package: MMod-Node
- * version: 0.1.4
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MassivelyModified</a>
- * copyright: 2013-2014 Richard B. Winters
+ * package: nodakwaeri
+ * sub-package: controller/404
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
+ * copyright: 2011-2014 Massively Modified, Inc.
+ * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
 
 exports.get = function( request, response )

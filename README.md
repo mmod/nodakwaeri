@@ -1,6 +1,9 @@
-# nodakwaeri (nk)
+# nodakwaeri ( nk $Id:$ )
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
+
+<b>Notice:</b>
+Please keep in mind that while the version is '0'.<anything> ( the key part being '0' in front ), this package should be considered - and used as if it were - a pre-release.  Things should work, but you may find issues.  I would encourage you to please report them [here](https://github.com/mmod/nodakwaeri/issues).
 
 
 ## Installation
@@ -21,6 +24,8 @@ var nk = require( 'nk' );
 nk = new nk();
 ...
 ```
+
+<i>NOTE: When you do not pass a configuration to the constructor, the resulting object instance only contains the tools (.type, .extend, .each, .hash, .sjcl, etc.)</i>
 
 
 ## Usage
@@ -107,15 +112,15 @@ nodakwaeri also provides all of the facilities one might need to create an appli
 Factory | Purpose
 --------|--------
 Server  | Defines and initialises the http server, listening for incoming client connections.  Utilizes the session and router factories.
-Session | Creates and manages all client sessions to provide persistence for the end user.
+Session | Creates and manages all client sessions to provide persistence for the end user.  Protects against 'Session Take-over' and 'Session Injection' techniques.  Provides tools to the developer for manipulating the session.
 Router  | Detects and processes media requests from the browser and/or routes client requests to the proper controller for further processing.
-Cryptography | nodakwaeri is bootstrapped with [The Stanford Javascript Crypto Library](http://crypto.stanford.edu/sjcl/), via their [BSD License](https://github.com/bitwiseshiftleft/sjcl/blob/master/README/bsd.txt).
+SCJL (Cryptography) | nodakwaeri is bootstrapped with [The Stanford Javascript Crypto Library](http://crypto.stanford.edu/sjcl/), via their [BSD License](https://github.com/bitwiseshiftleft/sjcl/blob/master/README/bsd.txt).
 Controller | Implements the MVC design pattern.  Invokes the derived controller requested. Developers define the application's controllers.
 Model | Implements the MVC design pattern.  Provides the interface to the data integration tools and database object.  Developers define the application's models.
 Renderer | Implements the MVC design pattern.  Constructs XHTML for the response to the client, provides a fully featured scripting language for templating, and allows for shared layouts and powerful organization.  Developers define the application's views.
 HTML | Provides tools for generating commonly used HTML5 controls in Accessible Rich Internet Applications (ARIA).
 
-<i>As a side note, by default nk-mvc makes uses of nodamysql ([nk-mysql](https://github.com/mmod/nodamysql)) as a database provider, and the included template uses Bootstrap(which includes Normalize) and jQuery via CDN.</i>
+<i>As a side note, by default nk-mvc makes uses of nodamysql ([nk-mysql](https://github.com/mmod/nodamysql)) as a database provider, and uses Bootstrap(which includes Normalize) and jQuery via CDN.</i>
 
 nodakwaeri is designed to work out of the box using a config file from the root of your application:
 
@@ -160,7 +165,7 @@ Feel free to fork the repository and submit pull requests. Browse any of our oth
 
 ### Created with:
 
-[Eclipse Kepler](https://www.eclipse.org/downloads/)
+[Eclipse Luna](https://www.eclipse.org/downloads/)
 
 [Nodeclipse](https://github.com/Nodeclipse/nodeclipse-1)
  ([Eclipse Marketplace](http://marketplace.eclipse.org/content/nodeclipse), [site](http://www.nodeclipse.org))

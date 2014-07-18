@@ -1,14 +1,13 @@
 /**
  * package: nodakwaeri
- * version: 0.1.4
- * author:  Richard B. Winters <a href="mailto:rik@massivelymodified.com">rik At MMOGP</a>
+ * version: 0.2.0
+ * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
 
 // Deps
 var http = require( 'http' ),
-	sjcl = require( './library/crypt/sjcl' ),
 	env = process.env.NODE_ENV
 
 if( env === ( "" || null ) )
@@ -21,14 +20,30 @@ module.exports = exports = nk;
 // Entry point to the NodaKwaeri module
 function nk( config )
 {
-	this.config = config[env];
-	this.config.debug = ( env === "development" ) ? true : false;
+	na = this;
+	
+	if( config )
+	{
+		this.config = config[env];
+		this.config.debug = ( env === "development" ) ? true : false;
+	}
+	else
+	{
+		//console.log( 'No config - loading core tools.' );
+		for( var lib in this )
+		{
+			if( !na._coremap.hasOwnProperty( lib ) )
+			{
+				delete this.lib;
+			}
+		}
+	}
 };
 
 // Component version string
 nk.prototype._versionmap =
 {
-	"nodakwaeri": "0.1.3"
+	"nodakwaeri": "0.1.5"
 };
 
 // Object class to class type mapping
@@ -44,6 +59,22 @@ nk.prototype._classmap =
 	"[object RegExp]": 		"regexp",
 	"[object Object]": 		"object"
 };
+
+// Core facility mapping
+nk.prototype._coremap =
+{
+	"nk":	true,
+	"_versionmap": true,
+	"_classmap": true,
+	"_coremap": true,
+	"version": true,
+	"type": true,
+	"extend": true,
+	"each": true,
+	"sjcl": true,
+	"hash": true,
+	"html": true
+}
 
 /**
  * Gets the current NodaKwaeri Version
@@ -179,20 +210,44 @@ nk.prototype.each = function( o, f )
 	return false;
 };
 
-nk.prototype.hash = function( data, light, algo )
-{
-	var bitarray;
-	
-	if( light )
+/**
+ * Hashes a given password using the supplied salt
+ * 
+ * @param args Object 	Defines the arguments for the method
+ * 	@var data String		Defines the string to be hashed
+ * 	@var salt String		Defines a 128, 192, or 256 bit(s) string to derive a salt from
+ * 	@var iterations Int		( Optional ) Defines the number of iterations; Key stretching
+ * 	@var keySize Int		Controls how the method will interpret the salt argument
+ * 
+ * @returns String()	Securely hashed data.
+ * 
+ * @since 0.2.0
+ */
+nk.prototype.hash = function( args )
+{	
+	var na = this,
+		def = { data: 'password', salt: false, iterations: 100, keySize: 256 },
+		o = this.extend( args || {}, def );
+
+	// Courtesy of: https://jswebcrypto.azurewebsites.net/demo.html#/pbkdf2
+	var hmacSHA256 = function( key )
 	{
-		bitarray = sjcl.hash.sha1.hash( data );
-		
-		return sjcl.codec.hex.fromBits( bitarray );
+		var hasher = new na.sjcl.misc.hmac( key, na.sjcl.hash.sha256 );
+		this.encrypt = function()
+		{
+			return hasher.encrypt.apply( hasher, arguments );
+		};
+	};
+
+	if( !o.salt )
+	{
+		o.salt = "fff9a94e51b5aa416ff4c42a2e3c754447f3c78cb4f7da9226a63672e15bf00e";
 	}
 	
-	bitarray = sjcl.hash.sha256.hash( data );
+	var salt = this.sjcl.codec.hex.toBits( o.salt ),
+		derived = this.sjcl.misc.pbkdf2( o.data, salt, o.iterations, o.keySize, hmacSHA256 );
 	
-	return sjcl.codec.hex.fromBits( bitarray );
+	return this.sjcl.codec.hex.fromBits( derived );
 };
 
 /**
@@ -202,6 +257,9 @@ nk.prototype.hash = function( data, light, algo )
  */
 nk.prototype.init = function( o )
 {	
+	var na = this;
+	var nnk = new nk();
+	
 	// Set the defaults for those who wish to use NodaKwaeri to its
 	// fullest, and invoke this method supplying only the necessary paths
 	var defaults = 
@@ -249,7 +307,7 @@ nk.prototype.init = function( o )
 	// If a custom model provider wasn't provided, deploy the built in facility
 	if( o.model_provider === 'nk' )
 	{
-		o.model_provider = new this.model( { db_provider: o.db_provider, database: this.config.database, type: this.type, extend: this.extend } );
+		o.model_provider = new this.model( { db_provider: o.db_provider, database: this.config.database } );
 		console.log( 'Using nk.model for the application model provider' );
 	}
 	
@@ -270,7 +328,7 @@ nk.prototype.init = function( o )
 		// If custom rendering_tools was not provided in the configuration, add it
 		if( !o.hasOwnProperty( 'rendering_tools' ) )
 		{
-			o['rendering_tools'] = this;
+			o['rendering_tools'] = nnk;
 			console.log( 'Using nk for rendering tools' );
 		}
 		else
@@ -278,12 +336,12 @@ nk.prototype.init = function( o )
 			// Otherwise make sure it's an object, and then extend it to make sure all ends are covered in case of missing components
 			if( this.type( o.rendering_tools ) !== ( 'object' ) )
 			{
-				o.rendering_tools = this;
-				console.log( 'Using nk for rendering tools' );
+				o.rendering_tools = new nnk.html( nnk );
+				console.log( 'Replacing custom redering_tools with nk' );
 			}
 			else
 			{
-				o.rendering_tools = this.extend( o.rendering_tools, new this.html( this ) );
+				o.rendering_tools = this.extend( o.rendering_tools, new nnk.html( nnk ) );
 				console.log( 'Using custom rendering_tools' );
 			}
 		}
@@ -302,6 +360,8 @@ nk.prototype.init = function( o )
 	var server = new this.server( config );
 	server.start();
 };
+
+nk.prototype.sjcl = require( './library/sjcl/sjcl' );
 
 nk.prototype.server = require( "./library/server" );
 
