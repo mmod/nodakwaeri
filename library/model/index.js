@@ -19,7 +19,7 @@ module.exports = exports = model;
 
 function model( config )
 {
-	this.driver = config.db_provider.Driver;
+	this.driver = config.db_provider.driver;
 	this.config = config.database;
 };
 
