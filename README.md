@@ -1,4 +1,4 @@
-# nodakwaeri ( nk v0.2.1 )
+# nodakwaeri ( nk v0.2.3 )
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
@@ -38,7 +38,7 @@ When one desires to check the type of a variable, consider the following snippet
 ...
 if( nk.type( obj ) !== 'function' )
 {
-	// Do what you will
+    // Do what you will
 } 
 ...
 ```
@@ -46,9 +46,9 @@ if( nk.type( obj ) !== 'function' )
 
 ### Extending objects and/or arrays
 
-When extending objects and/or arrays, be aware that both variables must be of the same type; either objects or arrays, respectively.  This could change in the future, but probably not for a while anyways.
+When extending objects and/or arrays, they can be of either type. Default behaviors occur when extending like types.
 
-Consider the following code snippet:
+Objects:
 
 ```node
 var obj1 = { 'First': 1, 'Second': 2, 'Fourth': 4 };
@@ -58,7 +58,7 @@ obj1 = nk.extend( obj1, piece3 );
 
 for( var prop in obj1 )
 {
-	console.log( 'Key:' + prop + ', Value: ' + obj1[prop] + '.' );
+    console.log( 'Key:' + prop + ', Value: ' + obj1[prop] + '.' );
 }
 ```
 
@@ -71,10 +71,85 @@ When executed in node.js it should output:
 /> Key: Third, Value: 3.
 ```
 
+Arrays:
+
+```node
+var arr1 = [ 1, 2, 4 ];
+var piece3 = [ 3 ];
+
+arr1 = nk.extend( arr1, piece3 );
+
+for( var prop in arr1 )
+{
+    console.log( 'Key:' + prop + ', Value: ' + arr1[prop] + '.' );
+}
+```
+
+When executed in node.js it should output:
+
+```
+/> Key: 0, Value: 1.
+/> Key: 1, Value: 2.
+/> Key: 2, Value: 4.
+/> Key: 3, Value: 3.
+```
+
+When we wish to extend an array with an object, the default behavior is the same as when we extend an array with an array.  However, if we pass `false` as a third argument to the `extend()` method we can get nk to act as if we are extending default values onto an object:
+
+Arrays with Objects (Non-default):
+
+```node
+var arr1 = [ 1, 2, 4 };
+var piece3 = { '3': 3 };
+
+arr1 = nk.extend( arr1, piece3, false );
+
+for( var prop in arr1 )
+{
+    console.log( 'Key:' + prop + ', Value: ' + obj1[prop] + '.' );
+}
+```
+
+When executed in node.js it should output:
+
+```
+/> Key: 0, Value: 1.
+/> Key: 1, Value: 2.
+/> Key: 2, Value: 4.
+/> Key: 3, Value: 3.
+```
+
+As is typical with extending objects, had the object's property name been 0, 1, or 2, it would not have over-written the existing element's value.
+
+Extending an Object with an array works the same as the above, but has no 'non-default' behavior:
+
+```node
+var obj1 = { 'First': 1, 'Second': 2, 'Fourth': 4 };
+var piece3 = [ 3 ];
+
+obj1 = nk.extend( obj1, piece3 );
+
+for( var prop in obj1 )
+{
+    console.log( 'Key:' + prop + ', Value: ' + obj1[prop] + '.' );
+}
+```
+
+When executed in node.js it should output:
+
+```
+/> Key: First, Value: 1.
+/> Key: Second, Value: 2.
+/> Key: Fourth, Value: 4.
+/> Key: 0, Value: 3.
+```
+
+And of course, had obj1 already contained a property named 0, it would not have been over-written.
+
 
 ### Iterating variables
 
-It's not wholly complete, but one of our jQuery favorites is an absolute must:
+One of our jQuery favorites is an absolute must:
 
 ```node
 var obj1 = { 'First': 1, 'Second': 2, 'Fourth': 4 };
@@ -84,11 +159,11 @@ obj1 = nk.extend( obj1, piece3 );
 
 nk.each
 (
-	obj1,
-	function( k, v )
-	{
-		console.log( 'Key:' + k + ', Value: ' + v + '.' );
-	} 
+    obj1,
+    function( k, v )
+    {
+        console.log( 'Key:' + k + ', Value: ' + v + '.' );
+    } 
 );
 ```
 
@@ -100,6 +175,11 @@ Which of course, when executed in node.js, should output:
 /> Key: Fourth, Value: 4.
 /> Key: Third, Value: 3.
 ```
+
+You are able to pass 0, 1, or 2 arguments.  
+ * For 0 your callback will be called and no arguments passed. 
+ * For 1 your callback will be called and passed the value of the iterator's property/index only.
+ * For 2 your callback will be called and passed both the key and value of the iterator's property/index.
 
 
 ### Boot-Strapped
@@ -127,28 +207,6 @@ config = require( './config' ),
 app = new nk( config );
 
 app.init();
-// Your application is now running...
-```
-
-As opposed to something like the following:
-
-```node
-...
-app.init
-(
-	{	
-	 	routes: <routes_configuration>,							// OR
-	 	router: new nk.router(),
-	 	db_provider: <your custom provider>,
-	 	controller_path: __dirname + '/app/controllers',		// OR
-		controller_provider: new nk.controller( { 'controller_path': __dirname + '/app/controllers' } ),
-		model_path: __dirname + '/app/models',					// OR
-		model_provider: new nk.model( { 'model_path': __dirname + '/app/models' } ),
-		view_path: __dirname + '/app/views',					// OR	
-		view_provider: new nodaklay.pottr( { 'view_path': __dirname + '/app/views' } ),
-		asset_path: __dirname + '/assets'	
-	}
-);
 // Your application is now running...
 ```
 

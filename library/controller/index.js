@@ -19,120 +19,120 @@ module.exports = exports = controller;
 
 function controller( config )
 {
-	this.controller_path = config.controller_path;
-	this.model = config.model_provider;
-	
-	// Config is discarded and the controller receives an updated configuration from the router
+    this.controller_path = config.controller_path;
+    this.model = config.model_provider;
+    
+    // Config is discarded and the controller receives an updated configuration from the router
 };
 
 controller.prototype.approach = function( request, response )
 {
-	// Get the request url
-	//request.requrl = url.parse( request.url, true );
-	
-	// Get the request method
-	var request_method;
-	if( request.method === 'POST' )
-	{
-		request_method = 'Post';
-	}
-	else
-	{
-		request_method = '';
-	}
-	
-	// Get the path
-	var path = request.requrl.pathname;
-	
-	// Remove leading slash if present, we check for one using the original path in the switch below to handle default url processing by the controller
-	var tpath = path;
-	if( tpath.charAt( 0 ) === '/' )
-	{
-		tpath = tpath.substr( 1 );
-	}
-	
-	// And get the path parts
-	var parts = tpath.split( '/' );
-	
-	// Check that we got parts
-	if( parts.length > 0 )
-	{
-		// Great we had parts, now lets check whether there wasn't more than one
-		if( !parts.length > 1 )
-		{
-			// This tells us an action was not provided, let's set the default
-			parts[1] = 'index';
-		}
-	}
-	else
-	{
-		parts[0] = tpath;
-		parts[1] = 'index';
-	}
-	
-	// Here we attempt to load whatever resource is requested by controller name
-	// if there is an error we display the 404 page.
-	try
-	{	
-		switch( path )
-		{
-			case '/':
-			case '/home':
-			{
-				// Get our requested controller
-				var controller_type = require( this.controller_path + '/home' );
-				var requested_controller = new controller_type();
-				
-				requested_controller.controller_path = this.controller_path;
-				requested_controller.config = this.config;
-				requested_controller.config.controller = 'home';
-				requested_controller.model = this.model;
-				
-				// The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
-				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
-				if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
-				{
-					parts[1] = 'index';
-				}
-				
-				requested_controller.config.view = parts[1];
-				
-				// Require the controller, and use the action term within the parts array to invoke the proper controller method
-				requested_controller[parts[1] + request_method]( request, response );
-			}break;
-			
-			default:
-			{
-				// Get our requested controller
-				var controller_type = require( this.controller_path + '/' + parts[0] );
-				var requested_controller = new controller_type();
+    // Get the request url
+    //request.requrl = url.parse( request.url, true );
+    
+    // Get the request method
+    var request_method;
+    if( request.method === 'POST' )
+    {
+        request_method = 'Post';
+    }
+    else
+    {
+        request_method = '';
+    }
+    
+    // Get the path
+    var path = request.requrl.pathname;
+    
+    // Remove leading slash if present, we check for one using the original path in the switch below to handle default url processing by the controller
+    var tpath = path;
+    if( tpath.charAt( 0 ) === '/' )
+    {
+        tpath = tpath.substr( 1 );
+    }
+    
+    // And get the path parts
+    var parts = tpath.split( '/' );
+    
+    // Check that we got parts
+    if( parts.length > 0 )
+    {
+        // Great we had parts, now lets check whether there wasn't more than one
+        if( !parts.length > 1 )
+        {
+            // This tells us an action was not provided, let's set the default
+            parts[1] = 'index';
+        }
+    }
+    else
+    {
+        parts[0] = tpath;
+        parts[1] = 'index';
+    }
+    
+    // Here we attempt to load whatever resource is requested by controller name
+    // if there is an error we display the 404 page.
+    try
+    {   
+        switch( path )
+        {
+            case '/':
+            case '/home':
+            {
+                // Get our requested controller
+                var controller_type = require( this.controller_path + '/home' );
+                var requested_controller = new controller_type();
+                
+                requested_controller.controller_path = this.controller_path;
+                requested_controller.config = this.config;
+                requested_controller.config.controller = 'home';
+                requested_controller.model = this.model;
+                
+                // The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
+                // we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
+                if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
+                {
+                    parts[1] = 'index';
+                }
+                
+                requested_controller.config.view = parts[1];
+                
+                // Require the controller, and use the action term within the parts array to invoke the proper controller method
+                requested_controller[parts[1] + request_method]( request, response );
+            }break;
+            
+            default:
+            {
+                // Get our requested controller
+                var controller_type = require( this.controller_path + '/' + parts[0] );
+                var requested_controller = new controller_type();
 
-				requested_controller.controller_path = this.controller_path;
-				requested_controller.config = this.config;
-				requested_controller.config.controller = parts[0];
-				requested_controller.model = this.model;
+                requested_controller.controller_path = this.controller_path;
+                requested_controller.config = this.config;
+                requested_controller.config.controller = parts[0];
+                requested_controller.model = this.model;
 
-				// The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
-				// we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
-				if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
-				{
-					parts[1] = 'index';
-				}
+                // The requested action determines the view, ensure the view action specified exists and that its a function, otherwise
+                // we'll set Index as the action/view - and if that's not found then a great big 404 will display :)
+                if( toString.call( requested_controller[parts[1]] ) !== '[object Function]' )
+                {
+                    parts[1] = 'index';
+                }
 
-				requested_controller.config.view = parts[1];
+                requested_controller.config.view = parts[1];
 
-				// Require the controller, and use the action term within the parts array to invoke the proper controller method
-				requested_controller[parts[1] + request_method]( request, response );
-			}break;
-		}
-	}
-	catch( error )
-	{
-		// And log the error ofc
-		console.log( 'Controller error: ' + error + ' ' + path + ' nk/library/controller/index.js - line 151' );
-		
-		// If the controller can't be loaded for some reason, handle the exception by showing a 404
-		require( './404' ).get( request, response );
-		
-	}
+                // Require the controller, and use the action term within the parts array to invoke the proper controller method
+                requested_controller[parts[1] + request_method]( request, response );
+            }break;
+        }
+    }
+    catch( error )
+    {
+        // And log the error ofc
+        console.log( 'Controller error: ' + error + ' ' + path + ' nk/library/controller/index.js - line 151' );
+        
+        // If the controller can't be loaded for some reason, handle the exception by showing a 404
+        require( './404' ).get( request, response );
+        
+    }
 };
