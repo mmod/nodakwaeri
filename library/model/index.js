@@ -19,31 +19,31 @@ module.exports = exports = model;
 
 function model( config )
 {
-	this.driver = config.db_provider.driver;
-	this.config = config.database;
+    this.driver = config.db_provider.driver;
+    this.config = config.database;
 };
 
 // Gets an instance of the DBO
 model.prototype.dbo = function()
 {
-	var config = this.config;
-	config.model = this.schema;
-	
-	return new this.driver( config );
+    var config = this.config;
+    config.model = this.schema;
+    
+    return new this.driver( config );
 };
 
 // Extends the base model object with derived properties
 model.prototype.set = function( child )
 {
-	var nmodel = this;
-	
-	// We'll do it the old fashioned way
-	for( var prop in child )
-	{
-		if( prop !== 'model' || 'dbo' || 'set' )
-		{
-			nmodel[prop] = child[prop];
-		}
-	}
-	return nmodel;
+    var nmodel = this;
+    
+    // We'll do it the old fashioned way
+    for( var prop in child )
+    {
+        if( prop !== 'model' || 'dbo' || 'set' )
+        {
+            nmodel[prop] = child[prop];
+        }
+    }
+    return nmodel;
 };
