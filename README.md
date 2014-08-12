@@ -1,4 +1,4 @@
-# nodakwaeri ( nk v0.2.2 )
+# nodakwaeri ( nk v0.2.3 )
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
@@ -142,6 +142,7 @@ When executed in node.js it should output:
 /> Key: Second, Value: 2.
 /> Key: Fourth, Value: 4.
 /> Key: 0, Value: 3.
+```
 
 And of course, had obj1 already contained a property named 0, it would not have been over-written.
 
