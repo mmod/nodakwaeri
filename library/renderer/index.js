@@ -46,32 +46,179 @@ renderer.prototype.turn = function( request, response, klay )
     {
         fs.readFile
         ( 
-                view_path + '/' + klay.layout + '.kml', 
-                'utf8', 
-                function( error, ldata )
+            view_path + '/' + klay.layout + '.kml', 
+            'utf8', 
+            function( error, ldata )
+            {
+                var buffer;
+                
+                // If there is an error
+                if( error )
                 {
-                    var buffer;
+                    // Log it
+                    console.log( 'Error reading layout: ' + view_path + '/' + klay.layout + '.kml' );
                     
-                    // If there is an error
-                    if( error )
-                    {
-                        // Log it
-                        console.log( 'Error reading layout: ' + klay.layout + '.' );
-                        
-                        // And set content to contain an error message
-                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
+                    // And set content to contain an error message
+                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
 
-                        response.statusCode = 200;
-                        response.setHeader( 'Content-Type', 'text/html' );
-                        //response.writeHead( 200, { 'Content-Type': 'text/html' } );
-                        response.write( buffer );
-                        response.end();
+                    response.statusCode = 200;
+                    response.setHeader( 'Content-Type', 'text/html' );
+                    //response.writeHead( 200, { 'Content-Type': 'text/html' } );
+                    response.write( buffer );
+                    response.end();
+                }
+                else
+                {
+                    // Success
+                    if( klay.partial )
+                    {
+                        var pcount = 0;
+                        for( var p in klay.partial )
+                        {
+                            fs.readFile
+                            ( 
+                                view_path + '/' + klay.partial[p] + '.kml', 
+                                'utf8', 
+                                function( error, pdata )
+                                {
+                                    var buffer;
+                                    
+                                    // If there is an error
+                                    if( error )
+                                    {
+                                        // Log it
+                                        console.log( 'Error reading partial: ' + klay.partial[p] + '.kml' );
+                                        
+                                        // And set content to contain an error message
+                                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
+                
+                                        response.statusCode = 200;
+                                        response.setHeader( 'Content-Type', 'text/html' );
+                                        //response.writeHead( 200, { 'Content-Type': 'text/html' } );
+                                        response.write( buffer );
+                                        response.end();
+                                    }
+                                    else
+                                    {
+                                        // Success
+                                        // There should always be a body
+                                        fs.readFile
+                                        (
+                                            view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+                                            'utf8',
+                                            function( error, vdata )
+                                            {
+                                                var buffer;
+                                                
+                                                if( error )
+                                                {
+                                                    // Log it
+                                                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
+                                                    
+                                                    // And set content to contain an error message
+                                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                                                    response.statusCode = 200;
+                                                    response.setHeader( 'Content-Type', 'text/html' );
+                                                    //response.writeHead();
+                                                    response.write ( buffer );
+                                                    response.end();
+                                                }
+                                                else
+                                                {
+                                                    //var pottr = nodakwaeri.klay();
+                                                    //pottr.turn( request, response, klay );
+                                                    klay.layout = ldata;
+                                                    klay.partial[p] = pdata;
+                                                    klay.view = vdata;
+                                                    
+                                                    processor.shape( request, response, klay ); 
+                                                }
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                            pcount++;
+                        }
                     }
                     else
                     {
-                        // Success
+                        // There should always be a body
                         fs.readFile
                         (
+                            view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+                            'utf8',
+                            function( error, vdata )
+                            {
+                                var buffer;
+                                
+                                if( error )
+                                {
+                                    // Log it
+                                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
+                                    
+                                    // And set content to contain an error message
+                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                                    response.statusCode = 200;
+                                    response.setHeader( 'Content-Type', 'text/html' );
+                                    //response.writeHead();
+                                    response.write ( buffer );
+                                    response.end();
+                                }
+                                else
+                                {
+                                    //var pottr = nodakwaeri.klay();
+                                    //pottr.turn( request, response, klay );
+                                    klay.layout = ldata;
+                                    klay.partial = false;
+                                    klay.view = vdata;
+                                    
+                                    processor.shape( request, response, klay ); 
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+        );
+    }else
+    {
+        if( klay.partial )
+        {
+            var pcount = 0;
+            for( var p in klay.partial )
+            {
+                fs.readFile
+                ( 
+                    view_path + '/' + klay.partial[p] + '.kml', 
+                    'utf8', 
+                    function( error, pdata )
+                    {
+                        var buffer;
+                        
+                        // If there is an error
+                        if( error )
+                        {
+                            // Log it
+                            console.log( 'Error reading partial: ' + klay.partial[p] + '.kml' );
+                            
+                            // And set content to contain an error message
+                            buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
+    
+                            response.statusCode = 200;
+                            response.setHeader( 'Content-Type', 'text/html' );
+                            //response.writeHead( 200, { 'Content-Type': 'text/html' } );
+                            response.write( buffer );
+                            response.end();
+                        }
+                        else
+                        {
+                            // Success
+                            // There should always be a body
+                            fs.readFile
+                            (
                                 view_path + '/' + klay.controller + '/' + klay.view + '.kml',
                                 'utf8',
                                 function( error, vdata )
@@ -96,48 +243,62 @@ renderer.prototype.turn = function( request, response, klay )
                                     {
                                         //var pottr = nodakwaeri.klay();
                                         //pottr.turn( request, response, klay );
-                                        klay.layout = ldata;
+                                        klay.layout = false;
+                                        klay.partial[p] = pdata;
                                         klay.view = vdata;
+                                        
                                         processor.shape( request, response, klay ); 
                                     }
                                 }
-                        );
+                            );
+                        }
+                    }
+                );
+                pcount++;
+            }
+        }
+        else
+        {
+            // There should always be a body
+            fs.readFile
+            (
+                view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+                'utf8',
+                function( error, vdata )
+                {
+                    var buffer;
+                    
+                    if( error )
+                    {
+                        // Log it
+                        console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
+                        
+                        // And set content to contain an error message
+                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                        response.statusCode = 200;
+                        response.setHeader( 'Content-Type', 'text/html' );
+                        //response.writeHead();
+                        response.write ( buffer );
+                        response.end();
+                    }
+                    else
+                    {
+                        //var pottr = nodakwaeri.klay();
+                        //pottr.turn( request, response, klay );
+                        klay.layout = false;
+                        klay.partial = false;
+                        klay.view = vdata;
+                        
+                        processor.shape( request, response, klay ); 
                     }
                 }
-        );
-    }else
-    {
-        fs.readFile
-        (
-            view_path + '/' + klay.controller + '/' + klay.view + '.kml',
-            'utf8',
-            function( error, data )
-            {
-                var buffer;
-                
-                if( error )
-                {
-                    // Log it
-                    console.log( 'Error reading view' );
-                    
-                    // And set content to contain an error message
-                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad!!!!...</h1><p>There was an issue loading the requested view: " + error + "\n" + data +"</p></body></html>";
-
-                    response.statusCode = 200;
-                    response.setHeader( 'Content-Type', 'text/html' );
-                    //response.writeHead();
-                    response.write( buffer );
-                    response.end();
-                }
-                else
-                {
-                    klay.layout = false;
-                    klay.view = data;
-                    processor.shape( request, response, klay );
-                }
-            }
-        );
+            );
+        }
     }
+    
+    
+
 }; 
 
 /**
@@ -145,8 +306,17 @@ renderer.prototype.turn = function( request, response, klay )
  */
 renderer.prototype.shape = function( request, response, klay )
 {
-    // First let's prepare the body content; there may not be a layout, but if there is we need the body first.
     var processor = this;
+
+    // First if there are partials we must prepare them
+    var partial = klay.partial;
+    for( var p in partial )
+    {
+        partial[p] = this.parse( partial[p], klay );
+    }
+    klay.partial = partial;
+    
+    // Now let's prepare the body content; there may not be a layout, but if there is we need the body first.
     var body = klay.view;
     body = this.parse( body, klay );
     
@@ -157,24 +327,6 @@ renderer.prototype.shape = function( request, response, klay )
         var view = klay.layout;
         view = this.parse( view, klay );
 
-        //for( var m in request.session )
-        //{
-        //  console.log( m + ': ' + request.session[m] );
-        //  if( m == 'data' )
-        //  {
-        //      for( var d in request.session[m] )
-        //      {
-        //          if( d == 'name' )
-        //          {
-        //              console.log( d + ': ' + request.session[m][d].first + ' ' + request.session[m][d].last );
-        //          }
-        //          else
-        //          {
-        //              console.log( d + ': ' + request.session[m][d] );
-        //          }
-        //      }
-        //  }
-        //}
         response.statusCode = 200;
         response.setSession();
         response.setHeader( 'Content-Type', 'text/html' );
@@ -226,8 +378,21 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
     (   /(\[\[[\s]*?(([\w_]*)((\.([\w_]*))*(\((.*)\))*([\s]*\{([^]*)\}[\s]*)*)*)[\s]*?\]\])/mg,  
         function( match, subscript, codeflow, fof, memflow, memstring, member, argflow, args, ssflow, superscript )
         {
-        
-            //console.log( fof );
+            if( fof === 'partial' )
+            {
+                if( args )
+                {
+                    var pdata = args;
+                    pdata = pdata.replace( ' ', '' );
+                    pdata = pdata.replace( ' ', '' );
+                    if( klay.partial[pdata] )
+                    {
+                        return processor.parse( klay.partial[pdata], klay );
+                    }
+                }
+                return "";
+            }
+            
             if( fof === 'foreach' )
             {
                 var found = false,

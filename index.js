@@ -1,6 +1,6 @@
 /**
  * package: nodakwaeri
- * version: 0.2.3
+ * version: 0.2.4
  * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
  * copyright: 2011-2014 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
@@ -137,7 +137,7 @@ nk.prototype.extend = function( a, b, def )
     
     if( tA === tB )
     {   // Both types are alike
-        if( tA === array )
+        if( tA === 'array' )
         {   // And both arrays
             var alength = a.length + 1;
             for( var i = 0; i < b.length; i++ )
@@ -159,7 +159,7 @@ nk.prototype.extend = function( a, b, def )
     }
     else
     {   // Otherwise
-        if( tA === array )
+        if( tA === 'array' )
         {   // We're extending an array with an object
             if( !def )
             {
