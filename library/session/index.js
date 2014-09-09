@@ -7,7 +7,10 @@
  */
 
 
-var timestamp,
+// Deps
+var events = require( 'events' ),
+    eventEmitter = new events.EventEmitter(),
+    timestamp,
     store = {},
     lut = [];
 
@@ -18,13 +21,14 @@ module.exports = exports = session;
 function session( config )
 {
     this.config = config;
-    store = {};
-    lut = [];
     for( var i=0; i<256; i++ ) 
     { 
-        lut[i] = ( i < 16 ? '0' : '' )+( i ).toString( 16 ); 
+        lut[i] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ); 
     };
+
+    eventEmitter.on( 'userAuthenticated', this.authenticateUser );
 };
+
 
 /**
  * Searches for a session
@@ -42,22 +46,22 @@ session.prototype.find = function( request, response, callback )
         ts = new Date(),
         stamp,
         expired = false;
-    
+
     // Start by parsing the cookies
     cookies = this.getCookies( request );
     cookies.id = cookies.id || this.genId();
     cookies.uk = cookies.uk || this.genId();
-    
+
     stamp = ts.setTime( ts.getTime() + ( 15 * 60 * 1000 ) );
     //console.log( 'Current session: ' + cookies.id );
     
     // Now check for the session by Id from the session store, and make sure the uk matches in order to further help in avoiding session take-over
     if( store.hasOwnProperty( cookies.id ) && store[cookies.id].uk === cookies.uk )
-    {   
+    {
         // Grab the current cookie expiration from the session store and then update the value to the new stamp.
         var cstamp = new Date( store[cookies.id].expires );
         store[cookies.id].expires = stamp;
-        
+
         // If the session store's time stamp had expired, it just means the session cleanup cycle hasn't run, let's make sure to set
         // the authenticated value to false so that it is updated on the client's side.
         if( ts > cstamp )
@@ -81,14 +85,15 @@ session.prototype.find = function( request, response, callback )
         store[cookies.id] = new clientSession( cfg );
     }
     //console.log( JSON.stringify( store[id].data ) );
-    
+
     // We pass a copy of the client in the request, as well as the accepted cookies, and a method to fetch them
     request.session = {};
     request.session.client = store[cookies.id];
     request.session.cookies = cookies;
     request.session.get = session.prototype.get;
+    request.setUserAuthenticated = session.prototype.setUserAuthenticated;
     request.isAuthenticated = session.prototype.isAuthenticated;
-    
+
     // We create an empty cookies member for allowing cookies to be set, then attach a method to do just that, as well as construct and send the headers
     response.session = {};
     response.session.tools = this.config.rendering_tools;   // Add these tools for the set function;
@@ -101,9 +106,41 @@ session.prototype.find = function( request, response, callback )
     response.session.set( 'sid', JSON.stringify( { i: cookies.id, d: cookies.uk } ), { secure: true } );
     response.setSession = session.prototype.setSession;
     response.redirect = session.prototype.redirect;
-    
+
     callback( request, response );
 };
+
+
+session.prototype.authenticateUser =  function( sid, unauth )
+{
+    if( !unauth )
+    {
+        console.log( sid + ' is already authenticated: ' + store[sid].authenticated );
+        store[sid].authenticated = true;
+        console.log( sid + ' is now authenticated: ' + store[sid].authenticated );
+    }
+    else
+    {
+        session.prototype.destroy( sid );
+        console.log( sid + ' is now signed out.' );
+    }
+};
+
+
+session.prototype.setUserAuthenticated = function( sid, unauth )
+{
+    if( !unauth )
+    {
+        console.log( 'Triggering userAuthenticated event and passing ' + sid + ', and FALSE, as arguments.' );
+        eventEmitter.emit( 'userAuthenticated', sid, false );
+    }
+    else
+    {
+        console.log( 'Triggering userAuthenticated event and passing ' + sid + ', and TRUE, as arguments.' );
+        eventEmitter.emit( 'userAuthenticated', sid, true );
+    }
+};
+
 
 session.prototype.getCookies = function( request )
 {
@@ -146,6 +183,9 @@ session.prototype.getCookies = function( request )
     return cookies;
 };
 
+
+
+
 /**
  * Generates a GUID
  * 
@@ -166,10 +206,16 @@ session.prototype.genId = function()
             lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
 };
 
+
+
+
 session.prototype.isAuthenticated = function()
 {
-    return this.client.authenticated;
+    console.log( 'authenticated: ' + this.session.client.id + ' - ' + store[this.session.client.id].authenticated );
+
+    return store[this.session.client.id].authenticated;
 };
+
 
 /**
  * Generates a cookie expiration date string
@@ -188,6 +234,7 @@ session.prototype.genExpirationDate = function( minutes )
     return d.toUTCString();
 };
 
+
 /**
  * Starts the session service
  * 
@@ -199,6 +246,7 @@ session.prototype.start = function( options )
     timestamp = new Date();
     this.cleanup( ( 5*60*1000 ) );
 };
+
 
 /**
  * Sets a Data/session variable
@@ -232,6 +280,7 @@ session.prototype.set = function( name, value, options )
     return false;
 };
 
+
 /**
  * Gets a Data/session variable
  * 
@@ -253,6 +302,7 @@ session.prototype.get = function( name, def )
     }
 };
 
+
 /**
  * Sets the sessions cookies
  * 
@@ -262,6 +312,7 @@ session.prototype.setSession = function()
 {
     this.setHeader( 'Set-Cookie', this.session.cookies );
 };
+
 
 /**
  * Sends a redirect header to the client
@@ -277,6 +328,7 @@ session.prototype.redirect = function( path )
     this.end( '<p>Please wait while we redirect you.</p>' );
 };
 
+
 /**
  * Performs cleanup tasks
  * 
@@ -288,7 +340,7 @@ session.prototype.cleanup = function( delay )
         count = 0,
         ts = new Date(),
         stamp;
-    
+
     if( store )
     {
         for( var client in store )
@@ -302,10 +354,11 @@ session.prototype.cleanup = function( delay )
             count++;
         }
     }
-    
+
     console.log( count + ' active client sessions.  Up since ' + timestamp + ', and is now: ' + new Date() );
     setTimeout( function(){ reaper( delay ); }, delay );
 };
+
 
 /**
  * Frees resources used by each session
@@ -317,8 +370,10 @@ session.prototype.destroy = function( id )
     delete store[id];
 };
 
+
 //Entry point to a client session
 var clientSession;
+
 
 /**
  * Constructor
@@ -333,4 +388,5 @@ function clientSession( config )
     this.path = config.path || '/';
     this.persistent = config.persistent || true;
     this.expires = config.expires;
+    this.authenticated = config.authenticated || false;
 };

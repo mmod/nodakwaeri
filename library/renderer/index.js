@@ -10,13 +10,23 @@
 // Deps;
 var fs = require( 'fs' );
 
+
 /**
  * Layout processor
  *
- * @since 0.0.1
+ * @since 0.2.5
  */
 module.exports = exports = renderer;
 
+
+/**
+ * Constructor
+ * 
+ * @param rendering_tools
+ * @param view_path
+ * 
+ * @since 0.0.5
+ */
 function renderer( rendering_tools, view_path )
 {
     this.nk = rendering_tools;
@@ -25,6 +35,7 @@ function renderer( rendering_tools, view_path )
     this.date = new Date();
 };
 
+
 /**
  * Fetches the layout content so it can be parsed
  * 
@@ -32,18 +43,18 @@ function renderer( rendering_tools, view_path )
  * @param response
  * @param klay
  * 
- * @since 0.0.5
+ * @since 0.2.5
  */
 renderer.prototype.turn = function( request, response, klay )
 {
     // We would normally invoke the nodaklay module, and use the Pottr to construct our layout.  For now we will use a JS
-    // version in order to help spur on development.
+    // version in order to help spur on development. To keep things working asynchronously, it might seem a bit messy - take your time in here.
     var view_path = this.view_path;
     var processor = this;
     
     // Construct will check if there is a layout specified, and invoke parse accordingly.
     if( klay.layout )
-    {
+    {   // The layout
         fs.readFile
         ( 
             view_path + '/' + klay.layout + '.kml', 
@@ -68,40 +79,179 @@ renderer.prototype.turn = function( request, response, klay )
                     response.end();
                 }
                 else
-                {
-                    // Success
-                    if( klay.partial )
+                {   // Success, now there could be up to three partial views to load
+                    if( klay.hasOwnProperty( 'partial' ) )
                     {
-                        var pcount = 0;
-                        for( var p in klay.partial )
+                        // Get the length of the partial object (we only support 3 partials per view)
+                        var pc = 0,
+                        parts = [];
+                        for( var part in klay.partial )
                         {
-                            fs.readFile
-                            ( 
-                                view_path + '/' + klay.partial[p] + '.kml', 
-                                'utf8', 
-                                function( error, pdata )
+                            parts[pc] = [ part, klay.partial[part] ];
+                            pc++;
+                        }
+
+                        // Start with the first partial
+                        fs.readFile
+                        (
+                            view_path + '/' + klay.controller + '/' + parts[0][1] + '.kml',
+                            'utf8',
+                            function( error, pdata )
+                            {
+                                var buffer;
+                                
+                                if( error )
                                 {
-                                    var buffer;
+                                    // Log it
+                                    console.log( 'Error reading view, ' + view_path + '/' + klay.controller + '/' + parts[0][1] + '.kml' );
                                     
-                                    // If there is an error
-                                    if( error )
-                                    {
-                                        // Log it
-                                        console.log( 'Error reading partial: ' + klay.partial[p] + '.kml' );
-                                        
-                                        // And set content to contain an error message
-                                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
-                
-                                        response.statusCode = 200;
-                                        response.setHeader( 'Content-Type', 'text/html' );
-                                        //response.writeHead( 200, { 'Content-Type': 'text/html' } );
-                                        response.write( buffer );
-                                        response.end();
+                                    // And set content to contain an error message
+                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested partial view 1!</p></body></html>"; 
+
+                                    response.statusCode = 200;
+                                    response.setHeader( 'Content-Type', 'text/html' );
+                                    //response.writeHead();
+                                    response.write ( buffer );
+                                    response.end();
+                                }
+                                else
+                                {
+                                    klay.partial[parts[0][0]] = pdata;
+                                    if( parts.length > 1 )
+                                    {   // The second partial
+                                        fs.readFile
+                                        (
+                                            view_path + '/' + klay.controller + '/' + parts[1][1] + '.kml',
+                                            'utf8',
+                                            function( error, p2data )
+                                            {
+                                                var buffer;
+
+                                                if( error )
+                                                {
+                                                    // Log it
+                                                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + parts[1][1] + '.kml' );
+                                                    
+                                                    // And set content to contain an error message
+                                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested partial view!</p></body></html>"; 
+
+                                                    response.statusCode = 200;
+                                                    response.setHeader( 'Content-Type', 'text/html' );
+                                                    //response.writeHead();
+                                                    response.write ( buffer );
+                                                    response.end();
+                                                }
+                                                else
+                                                {
+                                                    klay.partial[parts[1][0]] = p2data;
+                                                    if( parts.length > 2 )
+                                                    {   // Third partial
+                                                        fs.readFile
+                                                        (
+                                                            view_path + '/' + klay.controller + '/' + parts[2][1] + '.kml',
+                                                            'utf8',
+                                                            function( error, p3data )
+                                                            {
+                                                                var buffer;
+                                                                
+                                                                if( error )
+                                                                {
+                                                                    // Log it
+                                                                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + parts[2][1] + '.kml' );
+                                                                    
+                                                                    // And set content to contain an error message
+                                                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                                                                    response.statusCode = 200;
+                                                                    response.setHeader( 'Content-Type', 'text/html' );
+                                                                    //response.writeHead();
+                                                                    response.write ( buffer );
+                                                                    response.end();
+                                                                }
+                                                                else
+                                                                {
+                                                                    klay.partial[parts[2][0]] = p3data;
+
+                                                                    // There should always be a body
+                                                                    fs.readFile
+                                                                    (
+                                                                        view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+                                                                        'utf8',
+                                                                        function( error, vdata )
+                                                                        {
+                                                                            var buffer;
+                                                                            
+                                                                            if( error )
+                                                                            {
+                                                                                // Log it
+                                                                                console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
+                                                                                
+                                                                                // And set content to contain an error message
+                                                                                buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                                                                                response.statusCode = 200;
+                                                                                response.setHeader( 'Content-Type', 'text/html' );
+                                                                                //response.writeHead();
+                                                                                response.write ( buffer );
+                                                                                response.end();
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                //var pottr = nodakwaeri.klay();
+                                                                                //pottr.turn( request, response, klay );
+                                                                                klay.layout = ldata;
+                                                                                klay.view = vdata;
+                                                                                
+                                                                                processor.shape( request, response, klay ); 
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                }
+                                                            }
+                                                        );
+                                                    }
+                                                    else
+                                                    {   // There should always be a body
+                                                        fs.readFile
+                                                        (
+                                                            view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+                                                            'utf8',
+                                                            function( error, vdata )
+                                                            {
+                                                                var buffer;
+                                                                
+                                                                if( error )
+                                                                {
+                                                                    // Log it
+                                                                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
+                                                                    
+                                                                    // And set content to contain an error message
+                                                                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+
+                                                                    response.statusCode = 200;
+                                                                    response.setHeader( 'Content-Type', 'text/html' );
+                                                                    //response.writeHead();
+                                                                    response.write ( buffer );
+                                                                    response.end();
+                                                                }
+                                                                else
+                                                                {
+                                                                    //var pottr = nodakwaeri.klay();
+                                                                    //pottr.turn( request, response, klay );
+                                                                    klay.layout = ldata;
+                                                                    klay.view = vdata;
+                                                                    
+                                                                    processor.shape( request, response, klay ); 
+                                                                }
+                                                            }
+                                                        );
+                                                    }
+                                                }
+                                            }
+                                        );
                                     }
                                     else
-                                    {
-                                        // Success
-                                        // There should always be a body
+                                    {   // There should always be a body
                                         fs.readFile
                                         (
                                             view_path + '/' + klay.controller + '/' + klay.view + '.kml',
@@ -129,7 +279,6 @@ renderer.prototype.turn = function( request, response, klay )
                                                     //var pottr = nodakwaeri.klay();
                                                     //pottr.turn( request, response, klay );
                                                     klay.layout = ldata;
-                                                    klay.partial[p] = pdata;
                                                     klay.view = vdata;
                                                     
                                                     processor.shape( request, response, klay ); 
@@ -138,13 +287,11 @@ renderer.prototype.turn = function( request, response, klay )
                                         );
                                     }
                                 }
-                            );
-                            pcount++;
-                        }
+                            }
+                        );
                     }
                     else
-                    {
-                        // There should always be a body
+                    {   // There should always be a body
                         fs.readFile
                         (
                             view_path + '/' + klay.controller + '/' + klay.view + '.kml',
@@ -172,9 +319,9 @@ renderer.prototype.turn = function( request, response, klay )
                                     //var pottr = nodakwaeri.klay();
                                     //pottr.turn( request, response, klay );
                                     klay.layout = ldata;
-                                    klay.partial = false;
                                     klay.view = vdata;
-                                    
+                                    klay.partial = false;
+
                                     processor.shape( request, response, klay ); 
                                 }
                             }
@@ -185,136 +332,56 @@ renderer.prototype.turn = function( request, response, klay )
         );
     }else
     {
-        if( klay.partial )
-        {
-            var pcount = 0;
-            for( var p in klay.partial )
+        // There should always be a body
+        fs.readFile
+        (
+            view_path + '/' + klay.controller + '/' + klay.view + '.kml',
+            'utf8',
+            function( error, vdata )
             {
-                fs.readFile
-                ( 
-                    view_path + '/' + klay.partial[p] + '.kml', 
-                    'utf8', 
-                    function( error, pdata )
-                    {
-                        var buffer;
-                        
-                        // If there is an error
-                        if( error )
-                        {
-                            // Log it
-                            console.log( 'Error reading partial: ' + klay.partial[p] + '.kml' );
-                            
-                            // And set content to contain an error message
-                            buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad...</h1><p>There was an issue loading the requested layout!</p></body></html>";
-    
-                            response.statusCode = 200;
-                            response.setHeader( 'Content-Type', 'text/html' );
-                            //response.writeHead( 200, { 'Content-Type': 'text/html' } );
-                            response.write( buffer );
-                            response.end();
-                        }
-                        else
-                        {
-                            // Success
-                            // There should always be a body
-                            fs.readFile
-                            (
-                                view_path + '/' + klay.controller + '/' + klay.view + '.kml',
-                                'utf8',
-                                function( error, vdata )
-                                {
-                                    var buffer;
-                                    
-                                    if( error )
-                                    {
-                                        // Log it
-                                        console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
-                                        
-                                        // And set content to contain an error message
-                                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
-
-                                        response.statusCode = 200;
-                                        response.setHeader( 'Content-Type', 'text/html' );
-                                        //response.writeHead();
-                                        response.write ( buffer );
-                                        response.end();
-                                    }
-                                    else
-                                    {
-                                        //var pottr = nodakwaeri.klay();
-                                        //pottr.turn( request, response, klay );
-                                        klay.layout = false;
-                                        klay.partial[p] = pdata;
-                                        klay.view = vdata;
-                                        
-                                        processor.shape( request, response, klay ); 
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-                pcount++;
-            }
-        }
-        else
-        {
-            // There should always be a body
-            fs.readFile
-            (
-                view_path + '/' + klay.controller + '/' + klay.view + '.kml',
-                'utf8',
-                function( error, vdata )
+                var buffer;
+                
+                if( error )
                 {
-                    var buffer;
+                    // Log it
+                    console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
                     
-                    if( error )
-                    {
-                        // Log it
-                        console.log( 'Error reading view, ' + this.view_path + '/' + klay.controller + '/' + klay.view + '.kml' );
-                        
-                        // And set content to contain an error message
-                        buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
+                    // And set content to contain an error message
+                    buffer = "<html><head><title>Failure</title></head><body><h1>Too Bad???...</h1><p>There was an issue loading the requested view!</p></body></html>"; 
 
-                        response.statusCode = 200;
-                        response.setHeader( 'Content-Type', 'text/html' );
-                        //response.writeHead();
-                        response.write ( buffer );
-                        response.end();
-                    }
-                    else
-                    {
-                        //var pottr = nodakwaeri.klay();
-                        //pottr.turn( request, response, klay );
-                        klay.layout = false;
-                        klay.partial = false;
-                        klay.view = vdata;
-                        
-                        processor.shape( request, response, klay ); 
-                    }
+                    response.statusCode = 200;
+                    response.setHeader( 'Content-Type', 'text/html' );
+                    //response.writeHead();
+                    response.write ( buffer );
+                    response.end();
                 }
-            );
-        }
-    }
-    
-    
+                else
+                {
+                    //var pottr = nodakwaeri.klay();
+                    //pottr.turn( request, response, klay );
+                    klay.layout = false;
+                    klay.view = vdata;
 
+                    processor.shape( request, response, klay ); 
+                }
+            }
+        );
+    }
 }; 
+
 
 /**
  * Pieces together - and sends - the response
+ * 
+ * @param request
+ * @param response
+ * @param klay
+ * 
+ * @since 0.0.1
  */
 renderer.prototype.shape = function( request, response, klay )
 {
     var processor = this;
-
-    // First if there are partials we must prepare them
-    var partial = klay.partial;
-    for( var p in partial )
-    {
-        partial[p] = this.parse( partial[p], klay );
-    }
-    klay.partial = partial;
     
     // Now let's prepare the body content; there may not be a layout, but if there is we need the body first.
     var body = klay.view;
@@ -330,7 +397,6 @@ renderer.prototype.shape = function( request, response, klay )
         response.statusCode = 200;
         response.setSession();
         response.setHeader( 'Content-Type', 'text/html' );
-        //response.writeHead();
         response.write( view );
         response.end();
     }
@@ -339,14 +405,21 @@ renderer.prototype.shape = function( request, response, klay )
         response.statusCode = 200;
         response.setSession();
         response.setHeader( 'Content-Type', 'text/html' );
-        //response.writeHead();
         response.write( body );
         response.end();
     }
 };
 
+
 /**
  * Parses kwaeri script
+ * 
+ * @param content
+ * @param klay
+ * @param iteration
+ * @param identification
+ * 
+ * @since 0.0.5
  */
 renderer.prototype.parse = function( content, klay, iteration, identification )
 {
@@ -359,12 +432,12 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
     {
         iteration = false;
     }
-    
+
     if( !identification )
     {
         identification = false;
     }
-    
+
     var processor = this,
     o = content
     .replace // First strip all comments
@@ -374,25 +447,99 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
             return "";
         }
     )
-    .replace // Now we parse through the subscript blocks and invoke any members and replace any variables /(\[\[[\s\t\r\n]*(([a-zA-Z0-9_]*)((\.([a-zA-Z0-9_]*))*(\((.*)\))?)*)[\s\t\r\n]*\]\])/mg,
+    .replace // Now we parse through the subscript blocks and invoke any members and replace any variables /(\[\[[\s]*?(([\w_]*)((\.([\w_]*))*(\((.*)\))*([\s]*\{([^]*)\}[\s]*)*)*)[\s]*?\]\])/mg, 
     (   /(\[\[[\s]*?(([\w_]*)((\.([\w_]*))*(\((.*)\))*([\s]*\{([^]*)\}[\s]*)*)*)[\s]*?\]\])/mg,  
-        function( match, subscript, codeflow, fof, memflow, memstring, member, argflow, args, ssflow, superscript )
+        function( match, subscript, codeflow, fof, memflow, memstring, member, argflow, args, ssflow, superscript, esflow, extrascript )
         {
             if( fof === 'partial' )
             {
                 if( args )
                 {
-                    var pdata = args;
+                    var pdata = args,
+                    ndata;
+
                     pdata = pdata.replace( ' ', '' );
                     pdata = pdata.replace( ' ', '' );
-                    if( klay.partial[pdata] )
+
+                    if( klay.partial.hasOwnProperty( pdata ) )
                     {
-                        return processor.parse( klay.partial[pdata], klay );
+                        console.log( 'yup' );
+                        ndata = klay.partial[pdata];
+                        return processor.parse( ndata, klay );
+                    }
+
+                    return '';
+                }
+                else
+                {
+                    return "";
+                }
+            }
+
+            if( fof === 'if' )
+            {
+                var ncf = superscript, tflow = false, fflow = false, adata = false, ndata = false;
+
+                if( args )
+                {
+                    adata = args.replace( ' ', '' );
+                    adata = adata.replace( ' ', '' );
+                    //console.log( 'Arg: >>' + adata + '<<' );
+                }
+                else
+                {
+                    return "Didnt gotted it.";
+                }
+
+                // We split the superscripts, but do so with regex to support universal formatting of the code blocks
+                tflow = ncf.split( /\}[\s]*else[\s]*\{/g );
+
+                if( tflow.length > 1 )
+                {
+                    fflow = tflow[1];
+                    tflow = tflow[0];
+                    //console.log( 'True clause: ' + tflow );
+                    //console.log( 'false clause: ' + fflow );
+                }
+                else
+                {
+                    tflow = ncf.replace( /\}$/g, "" );
+                    fflow = false;
+                    console.log( 'Only clause: ' + tflow );
+                }
+
+                if( klay.viewbag.hasOwnProperty( adata ) )
+                {
+                    if( klay.viewbag[adata] && tflow )
+                    {
+                        return processor.parse( tflow, klay );
+                    }
+                    else 
+                    {
+                        if( !klay.viewbag[adata] && fflow )
+                        {
+                            return processor.parse( fflow, klay);
+                        }
+                        else
+                        {
+                            return "Error parsing kwaeri (if, 347)";
+                        }
                     }
                 }
-                return "";
+                else
+                {
+                    if( fflow )
+                    {
+                        console.log( 'Hitting the false flow of it wasnt found case: ' + fflow );
+                        return processor.parse( fflow, klay );
+                    }
+                    else
+                    {
+                        return "Error parsing kwaeri (if, 358)";
+                    }
+                }
             }
-            
+
             if( fof === 'foreach' )
             {
                 var found = false,
@@ -401,7 +548,7 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
                 identifier = false,
                 subscript = superscript,
                 ncf = codeflow;
-                
+
                 // For some reason we cannot single out the arguments when there are curly brackets following
                 // so let's parse it out from a smaller piece of data
                 found = ncf.replace
@@ -412,12 +559,12 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
                         return;
                     }
                 );
-                
+
                 if( found )
                 {
                     found = true;
                 }
-                    
+
                 if( pieces )
                 {
                     pieces = pieces.split( " as " );
@@ -437,7 +584,7 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
                 //console.log( identifier );
                 //console.log( ssflow );
                 //console.log( superscript );
-                
+
                 // Now, for each member of our array or object, we want to recursively run some scripts.  There could
                 // also be plain html, which should be copied and values parsed for each iteration.  Everything within
                 // superscript should be run/copied for each iteration, and should be passed only the member/record that 
@@ -468,7 +615,7 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
                 return so;
                 
             }
-            
+
             if( fof === 'html' )
             {
                 // Here we need to apply logic for filtering iterated parses
@@ -488,7 +635,7 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
                     return processor.decorate( fof, args, klay, memstring, false, false );
                 }
             }
-            
+
             if( iteration )
             {
                 if( identification )
@@ -506,9 +653,10 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
             }
         }
     );
-    
+
     return o;
 };
+
 
 /**
  * Returns the result of a subscript
@@ -516,17 +664,17 @@ renderer.prototype.parse = function( content, klay, iteration, identification )
 renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, identification )
 {
     var processor = this;
-    
+
     if( !iteration )
     {
         iteration = false;
     }
-    
+
     if( !identification )
     {
         iteration = false;
     }
-    
+
     // Returns the output of the subscript
     switch( fof )
     {
@@ -534,39 +682,39 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
         {
             return 'Test replacement worked!';
         }break;
-        
+
         case 'title':
         {
             return klay.viewbag.title;
         }break;
-        
+
         case 'pagetitle':
         {
             return klay.viewbag.pagetitle;
         }break;
-        
+
         case 'body':
         {
             return klay.view;
         }break;
-        
+
         case 'date.year':
         {
             return this.date.getFullYear();
         }break;
-        
+
         case 'model':
         {
             return 'model';
         }break;
-        
+
         case 'html':
         {
             var rtools = processor.rendering_tools,
             subscript = args,
             rargs = {},
             control = 0;
-            
+
             // Strip our arguments
             subscript = subscript
             .replace    //(((([a-zA-Z0-9_]*)(\.([a-zA-Z0-9_]*))*(\((.*)\))?[\}]?)|([\{](.*)\}))[\,]?)*/mg,
@@ -581,7 +729,7 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
                     return "";
                 }
             );
-            
+
             // The memstring contained .<whatever members were present after html>, let's split it
             var members = memstring.split( '.' );
             //console.log( members[0] + ' - ' + members[1] );
@@ -683,7 +831,7 @@ renderer.prototype.decorate = function( fof, args, klay, memstring, iteration, i
             
             return String( subscript );
         }break;
-        
+
         default:
         {
             if( iteration )
