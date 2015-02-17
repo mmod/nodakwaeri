@@ -1,11 +1,11 @@
-# nodakwaeri ( nk v0.2.4 )
+# nodakwaeri ( nk v0.3.1 )
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
 
 ## Installation
 
-Unless you are only planning on using a few pieces of nodakwaeri and intend to use custom facilities, it's recommended that you install nodakwaeri via the nk-mvc project template.  There is more in-depth documentation available for [nk-mvc](http://www.github.com/mmod/nk-mvc/) which covers all aspects of the framework, and provides an excellent starting place for any nodakwaeri application. 
+Unless you are only planning on using a few pieces of nodakwaeri and intend to use custom facilities, it's recommended that you install nodakwaeri via the nk-mvc or nk-xrm project template.  There is more in-depth documentation available for [nk-mvc](http://www.github.com/mmod/nk-mvc/) which covers all aspects of the framework, and provides an excellent starting place for any nodakwaeri application. The [nk-xrm](http://www.github.com/mmod/nk-xrm/) repository may also provide more advanced resources, examples, and documentation for working with nodakwaeri as progress is made.  
 
 
 To install the nodakwaeri module, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
