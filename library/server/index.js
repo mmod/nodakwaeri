@@ -8,46 +8,43 @@
 
 
 // Deps
-var http = require( 'http' );
-var qs = require( 'querystring' );
-var url = require( 'url' );
+var http = require( 'http' ),
+    qs = require( 'querystring' ),
+    url = require( 'url' );
 
 
-module.exports = exports = server;
-
-//Entry point of the server
+/**
+ * Entry point of the server
+ *
+ * @since 0.2.4
+ */
 function server( config )
 {
     this.config = config;
 };
 
+
 /**
  * Starts the server
- * 
+ *
  * @param void
- * 
+ *
  * @return void
- * 
+ *
  * @since 0.0.1
  */
 server.prototype.start = function()
 {
     var served = this;
 
-    // Get our session and routing provider(s)
-    //var session_provider = this.config.session_provider;
-    var routing_provider = this.config.routing_provider;
-    
-    //delete this.config['session_provider'];
-    delete this.config['routing_provider'];
-    
-    // Now create a new instance of our session and/or routing provider(s), feeding them their configuration ahead of time so we don't need
-    // to pass it forward each time - just this once (Now it doesn't really matter that I wanted to be so anal about
-    // verb-age :).
-    //var session = new session_provider( this.config );
-    var router = new routing_provider( this.config );
-    this.config.router = router;
-    
+    // Get our router
+    var droutr = this.config.routr;
+
+    // Now create a new instance of our router, feeding it the configuration
+    var routr = new droutr( this.config );
+    this.config.routr = routr;
+    delete droutr;
+
     // Define our http server application
     var app = http.createServer
     (
@@ -59,30 +56,39 @@ server.prototype.start = function()
             }
             else
             {
-                router.route( request, response );
+                served.config.routr.route( request, response );
             }
         }
     );
 
     // Start the http server
-    app.listen( this.config.server.port, this.config.server.host );
+    app.listen( this.config.server.port[this.config.appType], this.config.server.host );
     console.log( 'Platform: ' + process.platform + '\nArchitecture: ' + process.arch );
-    console.log( 'Listening to http://' + this.config.server.host + ' on port ' + this.config.server.port );
+    console.log( 'Listening to http://' + this.config.server.host + ' on port ' + this.config.server.port[this.config.appType] );
 };
 
+
+/**
+ * Processes a client's POST request
+ *
+ * @param request
+ * @param response
+ *
+ * @since 0.2.4
+ */
 server.prototype.processPost = function( request, response )
 {
     var served = this;
-    
+
     // Extract any posted data
     var posted = '';
     request.on
-    ( 
+    (
         'data',
         function( data )
         {
             posted += data.toString();
-            
+
             // Make sure we aren't getting DOS bombed
             if( posted.length > 1e6 )   // Assuming this works out to 5000000 or ~ 5MB
             {
@@ -92,15 +98,15 @@ server.prototype.processPost = function( request, response )
         }
     );
     request.on
-    ( 
-        'end', 
+    (
+        'end',
         function()
         {
             // Add a new member to our request object containing the data
             request.posted = qs.parse( posted );
             //console.log( request.posted );
-            
-            served.config.router.route( request, response );
+
+            served.config.routr.route( request, response );
         }
     );
     request.on
@@ -108,7 +114,11 @@ server.prototype.processPost = function( request, response )
         'error',
         function( e )
         {
-            console.log( 'Error receiving http body [POST]: ' + e.message );
+            console.log( 'Error receiving http body [POST]: ' + e.message + 'line: ', /\(file:[\w\d/.-]+:([\d]+)/.exec( e.stack )[1] );
         }
     );
 };
+
+
+// Export
+module.exports = exports = server;
