@@ -22,7 +22,7 @@
         "application",
         "framework",
         "mvc",
-        'xrm'
+        "xrm"
     ],
     "author": "Richard Winters <rik@mmogp.com> (http://www.mmogp.com)",
     "license": "Apache V2.0",
