@@ -1,8 +1,9 @@
-# nodakwaeri ( nk v0.3.1 )
+# nodakwaeri ( nk ) [![Donate via PayPal.com](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8ZCX9RCEQ2DDJ)
 
 A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.
 
 
+<br />
 ## Installation
 
 Unless you are only planning on using a few pieces of nodakwaeri and intend to use custom facilities, it's recommended that you install nodakwaeri via the nk-mvc or nk-xrm project template.  There is more in-depth documentation available for [nk-mvc](http://www.github.com/mmod/nk-mvc/) which covers all aspects of the framework, and provides an excellent starting place for any nodakwaeri application. The [nk-xrm](http://www.github.com/mmod/nk-xrm/) repository may also provide more advanced resources, examples, and documentation for working with nodakwaeri as progress is made.  
@@ -10,10 +11,11 @@ Unless you are only planning on using a few pieces of nodakwaeri and intend to u
 
 To install the nodakwaeri module, use npm as shown below in either terminal/shell or command prompt.  Be sure to have Node.js and Git installed, with the latter's root directory in your systems environment path.
 
-```
+```node
 path_to_app/> npm install nk
 ```
 
+<br />
 If all went well, then you can use it inside of any node application:
 
 ```node
@@ -22,14 +24,16 @@ nk = new nk();
 ...
 ```
 
+<br />
 <i>NOTE: When you do not pass a configuration to the constructor, the resulting object instance only contains the tools (.type, .extend, .each, .hash, .sjcl, etc.)</i>
 
 
+<br />
 ## Usage
 
-Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset.
+Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset, as well as visiting the [nodakwaeri wiki @ Github](http://github.com/mmod/nodakwaeri/wiki/nk-mysql).
 
-
+<br />
 ### Checking the type of a variable
 
 When one desires to check the type of a variable, consider the following snippet:
@@ -43,7 +47,7 @@ if( nk.type( obj ) !== 'function' )
 ...
 ```
 
-
+<br />
 ### Extending objects and/or arrays
 
 When extending objects and/or arrays, they can be of either type. Default behaviors occur when extending like types.
@@ -62,6 +66,7 @@ for( var prop in obj1 )
 }
 ```
 
+<br />
 When executed in node.js it should output:
 
 ```
@@ -71,6 +76,7 @@ When executed in node.js it should output:
 /> Key: Third, Value: 3.
 ```
 
+<br />
 Arrays:
 
 ```node
@@ -85,6 +91,7 @@ for( var prop in arr1 )
 }
 ```
 
+<br />
 When executed in node.js it should output:
 
 ```
@@ -94,6 +101,7 @@ When executed in node.js it should output:
 /> Key: 3, Value: 3.
 ```
 
+<br />
 When we wish to extend an array with an object, the default behavior is the same as when we extend an array with an array.  However, if we pass `false` as a third argument to the `extend()` method we can get nk to act as if we are extending default values onto an object:
 
 Arrays with Objects (Non-default):
@@ -110,6 +118,7 @@ for( var prop in arr1 )
 }
 ```
 
+<br />
 When executed in node.js it should output:
 
 ```
@@ -119,6 +128,7 @@ When executed in node.js it should output:
 /> Key: 3, Value: 3.
 ```
 
+<br />
 As is typical with extending objects, had the object's property name been 0, 1, or 2, it would not have over-written the existing element's value.
 
 Extending an Object with an array works the same as the above, but has no 'non-default' behavior:
@@ -135,6 +145,7 @@ for( var prop in obj1 )
 }
 ```
 
+<br />
 When executed in node.js it should output:
 
 ```
@@ -144,9 +155,10 @@ When executed in node.js it should output:
 /> Key: 0, Value: 3.
 ```
 
+<br />
 And of course, had obj1 already contained a property named 0, it would not have been over-written.
 
-
+<br />
 ### Iterating variables
 
 One of our jQuery favorites is an absolute must:
@@ -167,6 +179,7 @@ nk.each
 );
 ```
 
+<br />
 Which of course, when executed in node.js, should output:
 
 ```
@@ -176,12 +189,13 @@ Which of course, when executed in node.js, should output:
 /> Key: Third, Value: 3.
 ```
 
+<br />
 You are able to pass 0, 1, or 2 arguments.  
  * For 0 your callback will be called and no arguments passed. 
  * For 1 your callback will be called and passed the value of the iterator's property/index only.
  * For 2 your callback will be called and passed both the key and value of the iterator's property/index.
 
-
+<br />
 ### Boot-Strapped
 
 nodakwaeri also provides all of the facilities one might need to create an application.  This includes:
@@ -210,14 +224,20 @@ app.init();
 // Your application is now running...
 ```
 
-Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js) to see an example of the config.js file (a copy of it with values replaced by you would suffice).
+<br />
+Take a look at [nk-mvc](http://www.github.com/mmod/nk-mvc/blob/master/config.js), and [nk-xrm](https://github.com/mmod/nk-xrm/blob/master/config.js) to see some examples of the config.js file (a copy of either with values replaced by you would suffice for the respective project template).
 
 
+<br />
 ## Development
 
-Feel free to fork the repository and submit pull requests. Browse any of our other repositories as well http://github.com/mmod.
+Feel free to fork the repository and submit pull requests. Browse any of our other repositories as well [MMOD @ Github](http://github.com/mmod).
+
+   <sub>*You may also contribute by making a donation*</sub>   
+   [![Donate via PayPal.com](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8ZCX9RCEQ2DDJ)
 
 
+<br />
 ### Created with:
 
 [Eclipse Luna](https://www.eclipse.org/downloads/)

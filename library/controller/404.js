@@ -2,7 +2,7 @@
  * package: nodakwaeri
  * sub-package: controller/404
  * author:  Richard B. Winters <a href='mailto:rik@mmogp.com'>Rik At MMOGP</a>
- * copyright: 2011-2014 Massively Modified, Inc.
+ * copyright: 2011-2015 Massively Modified, Inc.
  * license: Apache, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>
  */
 
@@ -11,7 +11,7 @@ exports.get = function( request, response )
     response.setStatus = 404;
     response.setHeader( 'Content-Type', 'text/html' );
     //response.writeHead();
-    
+
     response.write
     (
             '<!doctype html>' +
@@ -35,9 +35,9 @@ exports.get = function( request, response )
                                     '<span class="icon-bar"></span>' +
                                 '</button>' +
                             '</div>' +
-                        
+
                             '<div class="collapse navbar-collapse" id="nk-navbar-collapse-1">' +
-                                
+
                                 '<ul class="nav navbar-nav navbar-right">' +
                                     '<li class="dropdown">' +
                                         '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Options<span class="caret"></span></a>' +
@@ -74,6 +74,6 @@ exports.get = function( request, response )
                 '</body>' +
             '</html>'
     );
-    
+
     response.end();
 };

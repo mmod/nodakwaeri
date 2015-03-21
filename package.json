@@ -1,6 +1,6 @@
 {
     "name": "nk",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "nodakwaeri (nk): A simple, yet powerful, and fully-featured cross-platform application framework for Node.js.",
     "main": "index.js",
     "scripts": 
@@ -25,7 +25,7 @@
         "xrm"
     ],
     "author": "Richard Winters <rik@mmogp.com> (http://www.mmogp.com)",
-    "license": "Apache V2.0",
+    "license": "Apache-2.0",
     "bugs": 
     {
         "url": "https://github.com/mmod/nodakwaeri/issues"
