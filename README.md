@@ -31,7 +31,7 @@ nk = new nk();
 <br />
 ## Usage
 
-Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset, as well as visiting the [nodakwaeri wiki @ Github](http://github.com/mmod/nodakwaeri/wiki/nk-mysql).
+Below describes some general usage of nodakwaeri.  Browsing the source will also prove to be a good way to get to know the nk toolset, as well as visiting the [nodakwaeri wiki @ Github](http://github.com/mmod/nodakwaeri/wiki/nk).
 
 <br />
 ### Checking the type of a variable
