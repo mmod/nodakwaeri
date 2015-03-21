@@ -31,5 +31,6 @@ node_modules
 .README.md.html
 .*~
 .*.*~
+.project
 .settings
 .pydevproject
