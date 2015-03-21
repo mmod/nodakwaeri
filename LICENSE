@@ -1,4 +1,4 @@
-Copyright 2011-2014 Massively Modified, Inc. <support@mmogp.com>
+Copyright 2011-2015 Massively Modified, Inc. <support@mmogp.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,6 +12,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+MySQL Connector C++ is licensed under the FOSS License Exception, and is bound
+by the terms of the above Apache License (Version 2.0).  A copy of the terms of
+the FOSS License Exception can be found via the link supplied within the License
+and Source of the accompanying MySQL Connector C++ Source, or by visiting the 
+following link
+
+http://www.mysql.com/about/legal/licensing/foss-exception/
 
 
 SJCL is licensed under a multi-clause BSD license.  You may obtain a copy
